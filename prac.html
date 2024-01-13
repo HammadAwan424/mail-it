@@ -1,0 +1,59 @@
+<html>
+  <head>
+    <title>Simple Map</title>
+    <link href="https://css.gg/css" rel="stylesheet">
+
+    <style>
+
+      .container {
+        width: 800px;
+        background-color: aqua;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+      td {
+        padding: 4px;
+        height: 40px;
+        border: 1px solid;
+      }
+      
+      .one, .second, .third, .fourth, .fifth, .seventh {
+        width: 1%;
+        white-space: nowrap
+      }
+      
+
+      #sixth > div {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+    </style>
+  </head>
+  <body>   
+    <div class="container">
+      <table>     
+          <tr>
+            <td class="one"><input type="checkbox"></td>
+            <td class="second"><span>Github</span></td>
+            <td class="third"><i class="gg-trash"></td>
+            <td class="fourth"><i class="gg-check-r"></i></td>
+            <td class="fifth"><i class="gg-more-vertical-alt"></i></td>
+            <td id="sixth">
+              <div id="child"></div>
+            </td>
+            <td class="seventh">9 Dec</td>
+          </tr>
+      </table>  
+    </div>
+  </body>
+
+  <script>
+    element = document.getElementById("child")
+    width = element.offsetWidth - 1
+    element.style.width = `${width}px`
+    element.innerHTML = "A personal access token (classic) 'For accessing Repo' with repo scope was recently added to youraccou raccount. Visit https: //github .com/ setting s/tokens  for more information."
+  </script>
+</html>
