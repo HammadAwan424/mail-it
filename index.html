@@ -16,118 +16,115 @@
                 display: flex;
                 min-height: 100%;
                 flex-flow: column nowrap;
-                background-color: dodgerblue;
             }
 
             .header {
                 flex: 0 1 24vh
             }
-
             .lower {
-                flex: 1 1 auto;
+                flex: 1 1 auto;               
+                display: flex;
+                flex-flow: row nowrap;
+            }
+
+            .left {
+                flex: 0 1 20%
+            }
+            .right {
+                flex: 1 1 80%
             }
 
             .box {
-                background-color: aliceblue;
                 text-align: center;
-                border: 2px solid rgb(94, 90, 90);
-                border-radius: 10px;
+                border: 1px solid rgb(94, 90, 90);
                 background-color: rgb(59, 59, 59);
             }
 
-            .row-flex {
-                display: flex;
-                flex-flow: row nowrap;
-            }
-
-            .email {
+            table {
+                border-collapse: collapse;
                 width: 100%;
-                height: 35px;
+            }
+            td {
+                padding: 4px;
+                height: 40px;
+                border: 1px solid;
+            }
+            
+            .first, .second, .third, .fourth, .fifth, .seventh {
+                width: 1%;
+                white-space: nowrap
+            }
+            .icons {
+                padding: 10px
+            }
+
+            .black {
+                color: rgb(0, 0, 0)
+            }
+            .seventh, .second {
+                font-weight: bold;
+            }
+
+            #sixth > div {
                 font-family: sans-serif;
-                text-align: left;
-                background-color: blue;
-                margin: 0;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
             }
 
-            .email > .message {
-                font-size: 1rem;
-                background-color: bisque;
-                height: 100%;
-                line-height: 2rem;
-                width: 74%;
-                float: left;
-                display: flex;
-                flex-flow: row nowrap;
-                align-items: flex-start;
-                justify-content: center;
-                overflow-y: hidden;
+            .hover:hover {
+                box-shadow: 0px -13px 17px -20px black inset;
             }
-
-            .email > .sender {
-                font-weight: bold;
-                width: 18%;
-                height: 100%;
-                background-color: brown;
-                float: left;
-                display: flex;
-                flex-flow: row nowrap;
-                align-items: center;
-            }
-
-            .email > .date {
-                font-weight: bold;
-                width: 8%;
-                height: 100%;
-                background-color: brown;
-                float: right;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-
-            .sender > * {
-                margin: 0;
-                margin-left: 7px;
-            }
-
-            .sender > i {
-                flex: 0 0 auto;
-            }
-
         </style>
         <title>Homepage</title>
     </head>
-    <body style="background-color: rgb(59, 59, 59);">            
+    <body>            
         <div class="flex-box">
             <div class="header box">
                 3
             </div>
             <div class="lower row-flex">
-                <div class="box" style="flex: 0 1 20%">
+                <div class="box left">
                     1
                 </div>
-                <div class="box" style="flex: 1 1 80%">
-                    
-                    <div class="email">
-
-                        <div class="sender">
-                            <input type="checkbox" class="form-check-input">
-                            <span style="flex: 1 1 auto">Github</span>
-                            <i class="gg-trash" style="margin-left: 20%"></i>
-                            <i class="gg-check-r"></i>
-                            <i class="gg-more-vertical-alt" style="margin-right: 7px;"></i>  
-                        </div>
-                        <div class="message">
-                            <div style="margin: 0 10px 0 10px;">A personal access token (classic) "For accessing Repo" with repo scope was recently added to youraccou raccount. Visit https: //github .com/ setting s/tokens  for more information.</div>
-                        </div>
-                        <div class="date">
-                            <div>9 Dec</div>                          
-                        </div>                        
-                                                
-                    </div>
-
+                <div class="box right">
+                    <table>     
+                        <tr class="hover">
+                          <td class="first"><input type="checkbox" class="form-check-input"></td>
+                          <td class="second"><span class="black">Github</span></td>
+                          <td class="third icons"><i class="gg-trash black"></td>
+                          <td class="fourth icons"><i class="gg-check-r black"></i></td>
+                          <td class="fifth icons"><i class="gg-more-vertical-alt black"></i></td>
+                          <td id="sixth">
+                            <div id="child" class="black"></div>
+                          </td>
+                          <td class="seventh black">11 Nov</td>
+                        </tr>
+                        <tr class="hover">
+                          <td class="first"><input type="checkbox" class="form-check-input"></td>
+                          <td class="second"><span class="black">Github</span></td>
+                          <td class="third icons"><i class="gg-trash black"></td>
+                          <td class="fourth icons"><i class="gg-check-r black"></i></td>
+                          <td class="fifth icons"><i class="gg-more-vertical-alt black"></i></td>
+                          <td id="sixth">
+                            <div id="scndchild" class="black"></div>
+                          </td>
+                          <td class="seventh black">11 Nov</td>
+                        </tr>
+                    </table>  
                 </div>
             </div>
         </div>
     </body>
+
+    <script>
+        element = document.getElementById("child")
+        width = element.offsetWidth - 1
+        element.style.width = `${width}px`
+        let str = "A personal access token (classic) 'For accessing Repo' with repo scope was recently added to youraccou raccount. Visit https: //github .com/ setting s/tokens  for more information."
+        element.innerHTML = str
+        child = document.getElementById("scndchild")
+        child.style.width =  `${width}px`
+        child.innerHTML = str
+      </script>
 </html>
