@@ -28,10 +28,10 @@
             }
 
             .left {
-                flex: 0 1 20%
+                flex: 0 1 20%;
             }
             .right {
-                flex: 1 1 80%
+                flex: 1 1 auto;
             }
 
             .box {
@@ -47,7 +47,9 @@
             td {
                 padding: 4px;
                 height: 40px;
-                border: 1px solid;
+            }
+            tr {
+                border-bottom: 1px solid rgb(54, 54, 54);
             }
             
             .first, .second, .third, .fourth, .fifth, .seventh {
@@ -64,6 +66,12 @@
             .seventh, .second {
                 font-weight: bold;
             }
+            .first {
+                padding-left: 10px;
+            }
+            .third {
+                padding-left: 20px;
+            }
 
             #sixth > div {
                 font-family: sans-serif;
@@ -73,7 +81,13 @@
             }
 
             .hover:hover {
-                box-shadow: 0px -13px 17px -20px black inset;
+                animation: transition;
+                animation-duration: 0.2s;
+                animation-fill-mode: forwards;                
+            }
+            @keyframes transition {
+                to {box-shadow: 0px -13px 20px -25px black inset;
+                    border-bottom: 1px solid rgb(39, 39, 39);}
             }
         </style>
         <title>Homepage</title>
@@ -90,19 +104,19 @@
                 <div class="box right">
                     <table>     
                         <tr class="hover">
-                          <td class="first"><input type="checkbox" class="form-check-input"></td>
-                          <td class="second"><span class="black">Github</span></td>
+                          <td class="first"><input type="checkbox" class="form-check-input" id="checkbox1"></td>
+                          <td class="second"><label class="black" for="checkbox1">Github</labem></td>
                           <td class="third icons"><i class="gg-trash black"></td>
                           <td class="fourth icons"><i class="gg-check-r black"></i></td>
                           <td class="fifth icons"><i class="gg-more-vertical-alt black"></i></td>
                           <td id="sixth">
                             <div id="child" class="black"></div>
                           </td>
-                          <td class="seventh black">11 Nov</td>
+                          <td class="seventh black icons">11 Nov</td>
                         </tr>
                         <tr class="hover">
-                          <td class="first"><input type="checkbox" class="form-check-input"></td>
-                          <td class="second"><span class="black">Github</span></td>
+                          <td class="first"><input type="checkbox" class="form-check-input" id="checkbox2"></td>
+                          <td class="second"><label class="black" for="checkbox2">Github</label></td>
                           <td class="third icons"><i class="gg-trash black"></td>
                           <td class="fourth icons"><i class="gg-check-r black"></i></td>
                           <td class="fifth icons"><i class="gg-more-vertical-alt black"></i></td>
