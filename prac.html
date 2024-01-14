@@ -34,15 +34,24 @@
         text-overflow: ellipsis;
       }
 
+      .newhover:hover {
+        animation: transition;
+        animation-duration: 0.15s;
+        animation-fill-mode: forwards;
+      }
+      @keyframes transition {
+        to {box-shadow: 0px -7px 9px -4px black inset;}
+      }
+    
       .hover:hover {
-        box-shadow: 0px -13px 17px -20px black inset;
+        box-shadow: 0px -7px 9px -4px black inset;
       }
     </style>
   </head>
   <body style="background-color: rgb(255, 255, 255);">   
     <div class="container">
       <table>     
-          <tr class="hover">
+          <tr class="newhover">
             <td class="one"><input type="checkbox"></td>
             <td class="second"><span>Github</span></td>
             <td class="third"><i class="gg-trash"></td>
@@ -53,7 +62,7 @@
             </td>
             <td class="seventh">11 Nov</td>
           </tr>
-          <tr class="hover">
+          <tr class="newhover">
             <td class="one"><input type="checkbox"></td>
             <td class="second"><span>Github</span></td>
             <td class="third"><i class="gg-trash"></td>
