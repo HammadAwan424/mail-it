@@ -7,7 +7,7 @@
 
       .container {
         width: 800px;
-        background-color: aqua;
+        background-color: rgb(255, 255, 255);
       }
       table {
         border-collapse: collapse;
@@ -27,17 +27,22 @@
       .seventh {
         font-weight: bold;
       }
+
       #sixth > div {
         overflow: hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
       }
+
+      .hover:hover {
+        box-shadow: 0px -13px 17px -20px black inset;
+      }
     </style>
   </head>
-  <body>   
+  <body style="background-color: rgb(255, 255, 255);">   
     <div class="container">
       <table>     
-          <tr>
+          <tr class="hover">
             <td class="one"><input type="checkbox"></td>
             <td class="second"><span>Github</span></td>
             <td class="third"><i class="gg-trash"></td>
@@ -45,6 +50,17 @@
             <td class="fifth"><i class="gg-more-vertical-alt"></i></td>
             <td id="sixth">
               <div id="child"></div>
+            </td>
+            <td class="seventh">11 Nov</td>
+          </tr>
+          <tr class="hover">
+            <td class="one"><input type="checkbox"></td>
+            <td class="second"><span>Github</span></td>
+            <td class="third"><i class="gg-trash"></td>
+            <td class="fourth"><i class="gg-check-r"></i></td>
+            <td class="fifth"><i class="gg-more-vertical-alt"></i></td>
+            <td id="sixth">
+              <div id="scndchild"></div>
             </td>
             <td class="seventh">11 Nov</td>
           </tr>
@@ -56,6 +72,10 @@
     element = document.getElementById("child")
     width = element.offsetWidth - 1
     element.style.width = `${width}px`
-    element.innerHTML = "A personal access token (classic) 'For accessing Repo' with repo scope was recently added to youraccou raccount. Visit https: //github .com/ setting s/tokens  for more information."
+    let str = "A personal access token (classic) 'For accessing Repo' with repo scope was recently added to youraccou raccount. Visit https: //github .com/ setting s/tokens  for more information."
+    element.innerHTML = str
+    child = document.getElementById("scndchild")
+    child.style.width =  `${width}px`
+    child.innerHTML = str
   </script>
 </html>
