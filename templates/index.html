@@ -139,7 +139,7 @@
                         <td class="seventh black">11 Nov</td>
                     </tr>
                     <tr class="hover">
-                        <td class="first"><input type="checkbox" class="form-check-input" id="checkbox2"></td>
+                        <td class="first" id="helll"><input type="checkbox" class="form-check-input" id="checkbox2"></td>
                         <td class="second"><label class="black" for="checkbox2">Github</label></td>
                         <td class="third icons"><i class="gg-trash black"></td>
                         <td class="fourth icons"><i class="gg-check-r black"></i></td>
@@ -166,10 +166,32 @@
     </body>
 
     <script>
-        text_elems = document.getElementsByClassName("message")
-        let message = "A personal access token (classic) 'For accessing Repo' with repo scope was recently added to youraccou raccount. Visit https: //github .com/ setting s/tokens  for more information."
-        for (let elem of text_elems) {
-            elem.innerHTML = message
-        }
+        document.addEventListener("DOMContentLoaded", function() {
+            text_elems = document.getElementsByClassName("message")
+            let message = "A personal access token (classic) 'For accessing Repo' with repo scope was recently added to youraccou raccount. Visit https: //github .com/ setting s/tokens  for more information."
+            for (let elem of text_elems) {
+                elem.innerHTML = message
+            }
+            
+            let checkboxes = document.getElementsByClassName("form-check-input")
+            let checkbox_color = ""
+
+            for (let checkbox of checkboxes) {
+                checkbox.addEventListener("change", function() {
+                    email_selector(checkbox)
+                })
+            }
+
+            function email_selector(checkbox) {
+                let tr = checkbox.closest("tr")
+                if (checkbox.checked) {
+                    checkbox_color = tr.style.backgroundColor
+                    tr.style.backgroundColor = "rgb(50, 80, 170)"           
+                }
+                else {
+                    tr.style.backgroundColor = checkbox_color
+                }
+            }
+        })
     </script>
 </html>
