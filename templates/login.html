@@ -7,58 +7,40 @@
         
         <style>
 
-            form {
-                padding: 100px;
+            body {
+                background-image: linear-gradient(to right, rgb(87, 150, 231), rgb(219, 26, 145));
+            }
+
+            h2 {
+                padding-top: 50px;
+                font-family: Arial;
+                font-weight: bold;
             }
 
             input {
-                background-color: rgba(0, 0, 0, 0);
                 width: 300px;
-                margin-top: 0.6rem;
+                margin-bottom: 0.6rem;
                 padding: 10px 5px;
-                outline: none;
                 border: none;
-                box-shadow: 0 -1px black inset;
-                color: white
+                border-bottom: 1px solid rgb(116, 116, 116);
+                outline: none;
             }
-
             
-            .blur {
-                position: absolute;
-                top: 0px;
-                bottom: 0px;
-                right: 0px;
-                left: 0px;
-                z-index: -1;
-                background-image: url("pxfuel(1).jpg");
-                background-repeat: no-repeat;
-                background-position: center;
-                background-size: cover;
-                filter: blur(2px);
+            p {
+                
             }
 
             .container {
-                margin: auto;
+                background-color: white;
+                width: 400px;
+                height: 500px;
                 position: relative;
-                overflow: hidden;
-                width: fit-content;
-                border-radius: 20px;
+                border-radius: 4px;
                 text-align: center;
-                box-shadow: 0 0 10px 10px white inset
             }
 
             input:focus {   
-                background-color: rgba(0, 0, 0, 0.2);
-                box-shadow: 1px 1px black inset, -1px -1px black inset;
-                border-radius: 5px;
-            }
-            input:focus::placeholder {
-                opacity: 0.8;
-            }
-
-            ::placeholder {
-                color: white;
-                opacity: 0.5;
+                background-color: rgba(0, 0, 0, 0);
             }
         </style>    
 
@@ -101,12 +83,13 @@
     </head>
     <body>
         <div class="container">
-            <div class="blur"></div>
+            <h2>Register</h2>
             <form action="/login" method="post">
+                <p class="small">Username</p>
                 <input autocomplete="off" type="text" name="name" placeholder="Username"> <br>
                 <input autocomplete="off" id="password" type="password" name="pass" placeholder="Password"> <br>
                 <input class="mb-4" id="con_password" autocomplete="off" type="password" name="con_pass" placeholder="Confirm Passwrod"> <br>
-                <p class="small" id="par" style="color:white; height: 21px;"></p>
+                <p class="small" id="par"></p>
                 <button type="submit" class="btn btn-primary">Register</button>
             </form>
         </div>
