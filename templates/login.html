@@ -48,15 +48,17 @@
                 text-align: center;
             }
 
-            .container {
+            .containerr {
                 display: flex;
                 flex-direction: column;
                 background-color: white;
-                width: 400px;
-                height: 500px;
                 position: relative;
                 border-radius: 4px;
                 text-align: center;
+                aspect-ratio: 4/5;
+                max-height: 50vh;
+                max-width: 80%;
+                margin: auto;
             }
 
             .custom_button {
@@ -111,7 +113,7 @@
         </script>
     </head>
     <body>
-        <div class="container mt-5">
+        <div class="containerr mt-5">
             <h2>Register</h2>
             <form class="mt-3" action="/login" method="post">
                 <div class="inputcontainer">
