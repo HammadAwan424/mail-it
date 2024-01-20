@@ -16,21 +16,41 @@
                 font-family: Arial;
                 font-weight: bold;
             }
-
+               
+            
             input {
-                width: 300px;
+                width: 100%;
                 margin-bottom: 0.6rem;
-                padding: 10px 5px;
+                padding: 5px 0px;
                 border: none;
                 border-bottom: 1px solid rgb(116, 116, 116);
                 outline: none;
             }
+
+            input:focus {
+                border-color: rgb(0, 0, 0);
+                box-shadow: 0 6px 8px -8px black;
+            }
+
+            .inputcontainer {
+                width: 300px;
+                margin: auto               
+            }
             
             p {
-                
+                margin: 0;
+                text-align: left;
+                font-size: 12px;
+                margin-top: 0.5rem;
+            }
+            
+            .center {
+                text-align: center;
             }
 
             .container {
+                display: flex;
+                flex-direction: column;
                 background-color: white;
                 width: 400px;
                 height: 500px;
@@ -39,8 +59,17 @@
                 text-align: center;
             }
 
-            input:focus {   
-                background-color: rgba(0, 0, 0, 0);
+            .custom_button {
+                width: 100%;
+                background-image: linear-gradient(to right, rgb(18, 184, 234), rgb(222, 87, 192));
+                border: none;
+                border-radius: 12px;
+                padding: 6px 0;
+                margin-top: 20px;
+            }
+
+            .footer {
+                margin-top: auto;
             }
         </style>    
 
@@ -82,16 +111,21 @@
         </script>
     </head>
     <body>
-        <div class="container">
+        <div class="container mt-5">
             <h2>Register</h2>
-            <form action="/login" method="post">
-                <p class="small">Username</p>
-                <input autocomplete="off" type="text" name="name" placeholder="Username"> <br>
-                <input autocomplete="off" id="password" type="password" name="pass" placeholder="Password"> <br>
-                <input class="mb-4" id="con_password" autocomplete="off" type="password" name="con_pass" placeholder="Confirm Passwrod"> <br>
-                <p class="small" id="par"></p>
-                <button type="submit" class="btn btn-primary">Register</button>
+            <form class="mt-3" action="/login" method="post">
+                <div class="inputcontainer">
+                    <p>Username</p>
+                    <input autocomplete="off" type="text" name="name" placeholder="Type your username"> <br>
+                    <p>Password</p>
+                    <input autocomplete="off" id="password" type="password" name="pass" placeholder="Type your password"> <br>
+                    <p>Confirm</p>
+                    <input id="con_password" autocomplete="off" type="password" name="con_pass" placeholder="Confirm Passwrod"> <br>
+                    <p class="small center" id="par"></p>
+                    <button type="submit" class="custom_button">Register</button>
+                </div>
             </form>
+            <p class="footer center mb-1">Or Login In Using <br><a href="www.youtube.com">Login</a></p>
         </div>
     </body>     
 </html>
