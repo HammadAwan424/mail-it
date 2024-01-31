@@ -1,0 +1,32 @@
+{% extends "login.html" %}
+
+{% block title %}
+    Register
+{% endblock %}
+
+{% block script %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function(){
+            checker("password", "par")
+            checker("con_password", "par")
+            disabler("btn", "password", "con_password")
+        });
+    </script>
+{% endblock %}
+
+{% block container %}
+    <h2>Register</h2>
+    <form action="/register" method="post">
+        <div class="inputcontainer">
+            <p>Username</p>
+            <input autocomplete="off" type="text" name="name" placeholder="Type your username"> <br>
+            <p>Password</p>
+            <input autocomplete="off" id="password" type="password" name="pass" placeholder="Type your password"> <br>
+            <p>Confirm</p>
+            <input id="con_password" autocomplete="off" type="password" name="con_pass" placeholder="Confirm Passwrod"> <br>
+            <p class="center" id="par"></p> <br>
+            <button id="btn" type="submit" class="custom_button" disabled>Register</button>
+        </div>
+    </form>
+    <p class="center mb-3">Or Login In Using <br><a href="/login">Login</a></p>
+{% endblock %}

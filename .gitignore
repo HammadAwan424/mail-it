@@ -1,0 +1,6 @@
+__pycache__/
+session/
+logging.log
+side.html
+database.db
+prac.py

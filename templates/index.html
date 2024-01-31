@@ -6,6 +6,7 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
         <link href="https://css.gg/css" rel="stylesheet">
         <link href="static/style.css" rel="stylesheet">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <style>
             html, body {
                 height: 100%;
@@ -25,6 +26,7 @@
                 flex: 1 1 auto; 
                 width: 100%;              
                 display: flex;
+                overflow: hidden;
             }
 
             .left {
@@ -44,21 +46,35 @@
                 table-layout: fixed;
             }
             td {
-                padding: 4px;
                 height: 40px;
                 border-top: 1px solid rgb(54, 54, 54);
                 display: flex;
                 align-items: center;
+                justify-content: center;
+                flex: 1 1 auto;
             }
+
+            .main {
+                height: 100%;
+                aspect-ratio: 1/1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 50%;
+                position: relative;
+            }
+            .form-check-input {
+                margin: 0;
+            }
+
             tr {
                 display: flex;
+                overflow: hidden;
+                position: relative;
             }
             
             .first, .second, .third, .fourth, .fifth, .seventh {
                 white-space: nowrap
-            }
-            .icons {
-                padding: 10px
             }
 
             .black {
@@ -67,16 +83,11 @@
             .seventh, .second {
                 font-weight: bold;
             }
-            .first {
-                padding-left: 10px;
-            }
-            .third {
-                padding-left: 20px;
-            }
 
             .sixth {
-                flex: 1 1 auto;
                 font-family: sans-serif;
+                flex: 50 1 450px;
+                justify-content: flex-start;
             }
 
             .sixth,
@@ -87,32 +98,147 @@
             }
 
             .hover:hover {
-                animation: shadow 0.1s forwards;          
+                box-shadow: 0px 13px 20px -10px rgb(34, 34, 34);
+                transition-duration: 0.1s;     
             }
             
-            /* For all tr's and their adjacent siblings(tr's) except the last one */
+            /* For all tr's and their adjacent sibling(tr's) except the last one */
             .hover:not(:last-child):hover > td,
             .hover:not(:last-child):hover + tr > td {
-                animation: border_top 0.1s forwards;
+                border-top: 1px solid rgb(39, 39, 39);
+                transition-duration: 0.1s;
             }
 
-            /* For last tr, permanent style and both animations */
-            tr:last-child > td {
+            /* For last tr, permanent style and both transitions */
+            .hover:last-child {
                 border-bottom: 1px solid rgb(54, 54, 54);
             }
-            tr:last-child:hover > td {
-                animation: border_below 0.1s forwards, border_top 0.1s forwards;
+            .hover:last-child:hover {
+                border-bottom: 1px solid rgb(39, 39, 39);
+            }
+            .hover:last-child:hover > td {
+                border-top: 1px solid rgb(39, 39, 39);
+                transition-duration: 0.1s;
+            }
+            .main:hover {
+                background-color: rgba(0, 0, 0, 0.1);
+                transition-duration: 0.1s;
             }
 
-            /* Definitions of basic animations */
-            @keyframes border_top {
-                to {border-top: 1px solid rgb(39, 39, 39);}
+            .rotation, .rotation2 {
+                position: absolute;
+                top: 0; left: 0; right: 0; bottom: 0;        
+                overflow: hidden;    
+                border-radius: 50%;   
             }
-            @keyframes shadow {
-                to {box-shadow: 0px 13px 20px -10px rgb(34, 34, 34);}
+
+            .rotation2:hover {
+                border-top: 3px solid black;
+                animation: orbit 0.5s, dissolve 0.3s linear 0.5s;
+                animation-fill-mode: forwards;
             }
-            @keyframes border_below {
-                to {border-bottom: 1px solid rgb(39, 39, 39);}
+
+            .rotation2:hover .dot2 {
+                opacity: 0;
+                position: absolute;
+                width: 5px;
+                height: 5px;
+                top: 0px;
+                left: 0; 
+                right: 0;
+                background-color: black;
+                border-radius: 50%;
+                margin: 0 auto;
+                animation: scale 0.3s linear 0.5s;
+                animation-fill-mode: forwards;
+            }
+
+            .rotation:hover {        
+                animation: orbit 0.5s; 
+            }
+
+            .rotation:hover .dot {
+                display: block;
+            }
+
+            .dot {
+                display: none;
+                position: absolute;
+                width: 5px;
+                height: 5px;
+                background-color: black;
+                border-radius: 50%;
+                top: 0px;
+                right: 0px;
+                left: 0px;
+                margin: 1px auto;
+                animation: scale 0.3s linear 0.5s;
+                animation-fill-mode: forwards;
+            }
+
+
+            .third:hover::before {
+                content: "";
+                width: 20%;
+                height: 100%;
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                right: 0;
+                background-color: black;
+                border-radius: 40px 0 0 40px;
+                animation: waiting 1s ease-in-out infinite
+            }
+            .delete {
+                animation: delete 0.1s linear 0.21s;
+                animation-fill-mode: forwards;
+                overflow: hidden;
+            }
+            .delete::before {
+                content: "";
+                width: 5px;
+                height: 5px;
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                right: 0;
+                margin: auto 10px;
+                background-color: black;
+                animation: grow 0.3s linear;
+                border-radius: 50%;
+            }
+            @keyframes delete {
+                0% {
+                    left: 0%;
+                }
+                100% {
+                    left: 100%;
+                    display: none;
+                }
+            }
+
+            @keyframes waiting {
+                50% {
+                    width: 30%
+                }
+                100% {width: 20%}
+            }
+
+            @keyframes grow {
+                70% {transform: scale(500, 40);}
+                100% {transform: scale(0, 0);}
+            }
+
+            @keyframes orbit {
+                to {transform: rotate(360deg);}
+            }
+            @keyframes dissolve {
+                to {border: 0}
+            }
+            @keyframes scale {
+                0% {opacity: 1;}
+                70% {transform: scale(14, 14); opacity: 1;}
+                100% {transform: scale(0, 0); opacity: 1;}
             }
         </style>
         <title>Homepage</title>
@@ -128,35 +254,39 @@
                 </div>
                 <table class="box">     
                     <tr class="hover">
-                        <td class="first"><input type="checkbox" class="form-check-input" id="checkbox1"></td>
-                        <td class="second"><label class="black" for="checkbox1">Github</labem></td>
-                        <td class="third icons"><i class="gg-trash black"></td>
-                        <td class="fourth icons"><i class="gg-check-r black"></i></td>
-                        <td class="fifth icons"><i class="gg-more-vertical-alt black"></i></td>
+                        <td class="first icons"><div class="main"><input type="checkbox" class="form-check-input" id="checkbox1"></div></td>
+                        <td class="second"><label class="black" for="checkbox1">Github</label></td>
+                        <td class="third icons"><div class="main"><i class="gg-trash black"></i></div></td>
+                        <td class="fourth icons"><div class="main"><i class="gg-check-r black"></i></div></td>
+                        <td class="fifth icons"><div class="main"><i class="gg-more-vertical-alt black"></i>
+                            <div class="rotation"><div class="dot"></div></div>
+                        </div></td>
+                        <td class="sixth">
+                        <div id="child" class="black message"></div>
+                        </td>
+                        <td class="seventh black">11 Nov</td>
+                    </tr>
+                    <tr class="hover select">
+                        <td class="first icons"><div class="main"><input type="checkbox" class="form-check-input" id="checkbox2"></div></td>
+                        <td class="second"><label class="black" for="checkbox2">Github</label></td>
+                        <td class="third icons"><div class="main"><i class="gg-trash black"></i></div></td>
+                        <td class="fourth icons"><div class="main"><i class="gg-check-r black"></i></div></td>
+                        <td class="fifth icons"><div class="main"><i class="gg-more-vertical-alt black"></i>
+                            <div class="rotation2"><div class="dot2"></div></div>
+                        </div></td>
                         <td class="sixth">
                         <div id="child" class="black message"></div>
                         </td>
                         <td class="seventh black">11 Nov</td>
                     </tr>
                     <tr class="hover">
-                        <td class="first" id="helll"><input type="checkbox" class="form-check-input" id="checkbox2"></td>
-                        <td class="second"><label class="black" for="checkbox2">Github</label></td>
-                        <td class="third icons"><i class="gg-trash black"></td>
-                        <td class="fourth icons"><i class="gg-check-r black"></i></td>
-                        <td class="fifth icons"><i class="gg-more-vertical-alt black"></i></td>
-                        <td class="sixth">
-                            <div id="scndchild" class="black message"></div>
-                        </td>
-                        <td class="seventh black">11 Nov</td>
-                    </tr>
-                    <tr class="hover">
-                        <td class="first"><input type="checkbox" class="form-check-input" id="checkbox3"></td>
+                        <td class="first icons"><div class="main"><input type="checkbox" class="form-check-input" id="checkbox3"></div></td>
                         <td class="second"><label class="black" for="checkbox3">Github</label></td>
-                        <td class="third icons"><i class="gg-trash black"></td>
-                        <td class="fourth icons"><i class="gg-check-r black"></i></td>
-                        <td class="fifth icons"><i class="gg-more-vertical-alt black"></i></td>
+                        <td class="third icons"><div class="main"><i class="gg-trash black"></i></div></td>
+                        <td class="fourth icons"><div class="main"><i class="gg-check-r black"></i></div></td>
+                        <td class="fifth icons"><div class="main"><i class="gg-more-vertical-alt black"></i></div></td>
                         <td class="sixth">
-                            <div id="thrdchild" class="black message"></div>
+                        <div id="child" class="black message"></div>
                         </td>
                         <td class="seventh black">11 Nov</td>
                     </tr>
@@ -171,10 +301,8 @@
             let message = "A personal access token (classic) 'For accessing Repo' with repo scope was recently added to youraccou raccount. Visit https: //github .com/ setting s/tokens  for more information."
             for (let elem of text_elems) {
                 elem.innerHTML = message
-            }
-            
+            }            
             let checkboxes = document.getElementsByClassName("form-check-input")
-            let checkbox_color = ""
 
             for (let checkbox of checkboxes) {
                 checkbox.addEventListener("change", function() {
@@ -185,13 +313,37 @@
             function email_selector(checkbox) {
                 let tr = checkbox.closest("tr")
                 if (checkbox.checked) {
-                    checkbox_color = tr.style.backgroundColor
-                    tr.style.backgroundColor = "rgb(50, 80, 170)"           
+                    tr.style.backgroundColor = "rgb(67, 102, 155)"  
+                    tr.style.boxShadow = "0 8px 10px -3px rgba(21, 77, 151, 0.5), 0 -8px 10px -3px rgba(21, 77, 151, 0.5)"
                 }
                 else {
-                    tr.style.backgroundColor = checkbox_color
+                    tr.style.backgroundColor = ""
+                    tr.style.boxShadow = ""
                 }
             }
+
+            function deleter() {
+                let trash_icons = document.getElementsByClassName("third")
+
+                for (let icon of trash_icons) {
+                    icon.addEventListener("click", function() {
+                        /*
+                        let tr = this.closest("tr");
+                        let i = 0;
+                        let id = setInterval(function() {
+                            tr.style.left = i + "%";
+                            if (i >= 100) {
+                                clearInterval(id);
+                                tr.style.display = "none"
+                            }
+                            i += 2;
+                        }, 1) */
+                        this.closest("tr").classList.add("delete")
+                    }) 
+                }
+            }
+
+            deleter()
         })
     </script>
 </html>
