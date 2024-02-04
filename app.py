@@ -1,8 +1,8 @@
 from flask import Flask, render_template, session, redirect, request
 from flask_session import Session
-from helpers import login, users, mails
+from helpers import login, users, mails, Email
 import logging
-from sqlalchemy import insert, create_engine
+from sqlalchemy import insert, create_engine, exists, select
 
 
 app = Flask(__name__)
@@ -15,6 +15,9 @@ Session(app)
 
 werkzeug_log = logging.getLogger('werkzeug')
 werkzeug_log.disabled = True
+logging.basicConfig(level=logging.DEBUG, filename="logging.log")
+
+engine = create_engine("sqlite:///database.db")
 
 @app.route("/")
 @login
@@ -31,6 +34,13 @@ def login():
     
     #manages for post request
     else:
+        user = request.form.get("username"), request.form.get("pass")
+        with engine.connect() as conn:
+            result = conn.execute(select(users).where(users.c.username == user[0], users.c.password == user[1]))
+            if result.scalar():
+                logging.info(f"Logged In a User: {user[0]}")
+                return "Worked Like A Charm"
+        return "Coundn't sign in"
         session["id"] = request.form.get("username")
         return redirect("/")
 
@@ -53,4 +63,5 @@ def register():
     with engine.begin() as conn:
         result = conn.execute(stmt)
         session["id"] = result.lastrowid
+        logging.info(f"Registered a User: {data[0]}")
         return redirect("/")
