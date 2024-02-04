@@ -11,18 +11,20 @@
             .top {
                 display: flex;
                 align-items: center;
+                flex-flow: row wrap;
             }
 
             .search_bar {
                 display: flex;
-                width: 50%;
-                min-width: 400px;
+                width: 100%;
                 align-items: center;
-                height: 44px;
-                border-radius: 20px;
+                height: 60px;
+                border-radius: 30px;
                 background-color: rgb(177, 177, 177);
-                margin: 5px 0;
+                margin: 15px 10px;
+                margin-bottom: 0px;
             }
+            
             
             .bubble {
                 height: 70%;
@@ -48,11 +50,17 @@
                 margin: 0;
             }
 
+            .top > p {
+                color: white;
+                font-size: small;
+                margin: 15px 15px;
+            }
+
             .user {
                 position: relative;
                 flex: 1 1 0px;
             }
-            .user > .image {
+            .search_bar > .image {
                 margin: 0 2% 0 auto;
                 position: relative;
                 width: 40px; 
@@ -85,132 +93,42 @@
                 background-color: rgb(255, 255, 255);
             }
 
-            @media screen and (max-width: 900px) {
-                .grid {
-                    grid-template-columns: 100%;
-                    grid-template-rows: 100px auto;
-                }
-                .left {
-                    display: none;
-                }
-                .no-mobile {
-                    display: none;
-                }
-
+            .sender_image {
+                background-color: red;
+                height: 80%;
+                aspect-ratio: 1 / 1;
+                border-radius: 50%;
             }
-
+            table {
+                width: 100%;
+            }
+            tr {
+                height: 55px;
+                display: flex;
+                margin: 0 15px;
+            }
         </style>
         <title>Homepage</title>
     </head>
     <body>            
         <div class="grid">
             <div class="top box">
-                <div class="basic no-mobile">
-                    <div class="bubble"><i class="gg-menu"></i></div>
-                    <h4>Mail</h4>
-                </div>
                 <form class="search_bar" action="/null" method="get">
-                    <i class="gg-search"></i>
-                    <input placeholder="Search">
+                    <div class="bubble"><i class="gg-menu"></i></div>
+                    <input placeholder="Search in emails">
+                    <div class="image"><p>H</p></div>
                 </form>
-                <div class="user"><div class="image"><p>H</p></div></div>
-            </div>           
+                <p>Primary</p>  
+            </div>         
             <div class="left box">
                 1
             </div>
             <div class="right box">
                 <table>     
                     <tr class="hover">
-                        <td class="first icons"><div class="main"><input type="checkbox" class="form-check-input" id="checkbox1"></div></td>
-                        <td class="second"><label class="black" for="checkbox1">Github</label></td>
-                        <td class="third icons side"><div class="main"><i class="gg-trash black"></i></div></td>
-                        <td class="fourth icons"><div class="main"><i class="gg-check-r black"></i></div></td>
-                        <td class="fifth icons"><div class="main"><i class="gg-more-vertical-alt black"></i>
-                            <div class="rotation"><div class="dot"></div></div>
-                        </div></td>
-                        <td class="sixth">
-                        <div id="child" class="black message"></div>
-                        </td>
-                        <td class="seventh black">11 Nov</td>
-                    </tr>
-                    <tr class="hover select">
-                        <td class="first icons"><div class="main"><input type="checkbox" class="form-check-input" id="checkbox2"></div></td>
-                        <td class="second"><label class="black" for="checkbox2">Github</label></td>
-                        <td class="third icons side"><div class="main"><i class="gg-trash black"></i></div></td>
-                        <td class="fourth icons"><div class="main"><i class="gg-check-r black"></i></div></td>
-                        <td class="fifth icons"><div class="main"><i class="gg-more-vertical-alt black"></i>
-                            <div class="rotation2"><div class="dot2"></div></div>
-                        </div></td>
-                        <td class="sixth">
-                        <div id="child" class="black message"></div>
-                        </td>
-                        <td class="seventh black">11 Nov</td>
-                    </tr>
-                    <tr class="hover">
-                        <td class="first icons"><div class="main"><input type="checkbox" class="form-check-input" id="checkbox3"></div></td>
-                        <td class="second"><label class="black" for="checkbox3">Github</label></td>
-                        <td class="third icons side"><div class="main"><i class="gg-trash black"></i></div></td>
-                        <td class="fourth icons"><div class="main"><i class="gg-check-r black"></i></div></td>
-                        <td class="fifth icons"><div class="main"><i class="gg-more-vertical-alt black"></i></div></td>
-                        <td class="sixth">
-                        <div id="child" class="black message"></div>
-                        </td>
-                        <td class="seventh black">11 Nov</td>
-                    </tr>
-                    <tr class="hover">
-                        <td class="first icons"><div class="main"><input type="checkbox" class="form-check-input" id="checkbox4"></div></td>
-                        <td class="second"><label class="black" for="checkbox4">Github</label></td>
-                        <td class="third icons side"><div class="main"><i class="gg-trash black"></i></div></td>
-                        <td class="fourth icons"><div class="main"><i class="gg-check-r black"></i></div></td>
-                        <td class="fifth icons"><div class="main"><i class="gg-more-vertical-alt black"></i></div></td>
-                        <td class="sixth">
-                        <div id="child" class="black message"></div>
-                        </td>
-                        <td class="seventh black">11 Nov</td>
-                    </tr>
-                    <tr class="hover">
-                        <td class="first icons"><div class="main"><input type="checkbox" class="form-check-input" id="checkbox5"></div></td>
-                        <td class="second"><label class="black" for="checkbox5">Github</label></td>
-                        <td class="third icons side"><div class="main"><i class="gg-trash black"></i></div></td>
-                        <td class="fourth icons"><div class="main"><i class="gg-check-r black"></i></div></td>
-                        <td class="fifth icons"><div class="main"><i class="gg-more-vertical-alt black"></i></div></td>
-                        <td class="sixth">
-                        <div id="child" class="black message"></div>
-                        </td>
-                        <td class="seventh black">11 Nov</td>
-                    </tr>
-                    <tr class="hover">
-                        <td class="first icons"><div class="main"><input type="checkbox" class="form-check-input" id="checkbox6"></div></td>
-                        <td class="second"><label class="black" for="checkbox6">Github</label></td>
-                        <td class="third icons side"><div class="main"><i class="gg-trash black"></i></div></td>
-                        <td class="fourth icons"><div class="main"><i class="gg-check-r black"></i></div></td>
-                        <td class="fifth icons"><div class="main"><i class="gg-more-vertical-alt black"></i></div></td>
-                        <td class="sixth">
-                        <div id="child" class="black message"></div>
-                        </td>
-                        <td class="seventh black">11 Nov</td>
-                    </tr>
-                    <tr class="hover">
-                        <td class="first icons"><div class="main"><input type="checkbox" class="form-check-input" id="checkbox7"></div></td>
-                        <td class="second"><label class="black" for="checkbox7">Github</label></td>
-                        <td class="third icons side"><div class="main"><i class="gg-trash black"></i></div></td>
-                        <td class="fourth icons"><div class="main"><i class="gg-check-r black"></i></div></td>
-                        <td class="fifth icons"><div class="main"><i class="gg-more-vertical-alt black"></i></div></td>
-                        <td class="sixth">
-                        <div id="child" class="black message"></div>
-                        </td>
-                        <td class="seventh black">11 Nov</td>
-                    </tr>
-                    <tr class="hover">
-                        <td class="first icons"><div class="main"><input type="checkbox" class="form-check-input" id="checkbox7"></div></td>
-                        <td class="second"><label class="black" for="checkbox7">Github</label></td>
-                        <td class="third icons side"><div class="main"><i class="gg-trash black"></i></div></td>
-                        <td class="fourth icons"><div class="main"><i class="gg-check-r black"></i></div></td>
-                        <td class="fifth icons"><div class="main"><i class="gg-more-vertical-alt black"></i></div></td>
-                        <td class="sixth">
-                        <div id="child" class="black message"></div>
-                        </td>
-                        <td class="seventh black">11 Nov</td>
+                        <td class="sender_image"></td>
+                        <div class="message"></div>
+                        <td class="data"></td>
                     </tr>
                 </table>  
             </div>            
