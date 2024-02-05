@@ -8,6 +8,19 @@
         <link href="../static/index.css" rel="stylesheet">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <style>
+            body {
+                background-image: linear-gradient(to right, rgb(46, 42, 42), rgb(33, 33, 59));
+            }
+            .grid {
+                display: grid;
+                min-height: 100%;
+                grid-template-columns: 100%;
+                grid-template-rows: auto 1fr;
+            }
+            .left {
+                display: none;
+            }
+
             .top {
                 display: flex;
                 align-items: center;
@@ -95,38 +108,40 @@
 
             .sender_image {
                 background-color: red;
-                height: 80%;
                 aspect-ratio: 1 / 1;
+                width: 40px;
                 border-radius: 50%;
                 margin-right: 15px;
+                flex: 0 0 auto;
             }
-            table {
-                width: 100%;
-            }
-            tr {
-                height: 55px;
-                display: flex;
-                margin: 0 15px;
-                width: 100%;
-            }
-            .overflow {           
-                display: flex;
-                flex: 1 1 auto;     
+            .sixth,
+            .sixth > div {   
                 overflow: hidden;
                 white-space: nowrap;
                 text-overflow: ellipsis;
+                color: white;
+            }
+            .message {
+                color: white
             }
             table {
-                table-layout: fixed;
+                border-collapse: separate;
                 width: 100%;
+                border-spacing: 0;
+                table-layout: fixed;
+            }
+            .sixth {
+                font-family: sans-serif;
+                flex: 50 1 450px;
+                justify-content: flex-start;
+            }
+            tr {
+                display: flex;
+                position: relative;
             }
             p {
                 color: white;
                 margin: 0px
-            }
-            .text {
-                display: flex;
-                flex: 1 1 auto;
             }
         </style>
         <title>Homepage</title>
@@ -148,8 +163,8 @@
                 <table>     
                     <tr class="hover">
                         <td class="sender_image"></td>
-                        <td class="text">
-                            <p class="overflow">A personal access token (classic) 'For accessing Repo' with repo scope was recentl</p>
+                        <td class="sixth">
+                            <div class="message">A personal access token (classic) 'For accessing Repo' with repo scope was recentl</div>
                         </td>
                     </tr>
                 </table>  
