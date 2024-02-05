@@ -98,6 +98,7 @@
                 height: 80%;
                 aspect-ratio: 1 / 1;
                 border-radius: 50%;
+                margin-right: 15px;
             }
             table {
                 width: 100%;
@@ -106,6 +107,26 @@
                 height: 55px;
                 display: flex;
                 margin: 0 15px;
+                width: 100%;
+            }
+            .overflow {           
+                display: flex;
+                flex: 1 1 auto;     
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+            }
+            table {
+                table-layout: fixed;
+                width: 100%;
+            }
+            p {
+                color: white;
+                margin: 0px
+            }
+            .text {
+                display: flex;
+                flex: 1 1 auto;
             }
         </style>
         <title>Homepage</title>
@@ -127,8 +148,9 @@
                 <table>     
                     <tr class="hover">
                         <td class="sender_image"></td>
-                        <div class="message"></div>
-                        <td class="data"></td>
+                        <td class="text">
+                            <p class="overflow">A personal access token (classic) 'For accessing Repo' with repo scope was recentl</p>
+                        </td>
                     </tr>
                 </table>  
             </div>            
