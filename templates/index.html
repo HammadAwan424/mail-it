@@ -33,12 +33,12 @@
                 align-items: center;
                 height: 60px;
                 border-radius: 30px;
-                background-color: rgb(177, 177, 177);
-                margin: 15px 10px;
+                background-image: linear-gradient(to right, rgb(60, 60, 60), rgb(33, 33, 59));
+                margin: 15px 15px 0 15px;
                 margin-bottom: 0px;
+                box-shadow: 0 0 10px 4px rgba(49, 49, 49, 0.438);
             }
-            
-            
+
             .bubble {
                 height: 70%;
                 aspect-ratio: 1 / 1;
@@ -52,7 +52,6 @@
                 background-color: rgb(92, 92, 92);
                 transition-duration: 0.2s;
             }
-
             .basic {
                 display: flex;
                 flex: 1 1 0px;
@@ -63,32 +62,35 @@
                 margin: 0;
             }
 
-            .top > p {
-                color: white;
-                font-size: small;
-                margin: 15px 15px;
-            }
-
             .user {
                 position: relative;
                 flex: 1 1 0px;
             }
-            .search_bar > .image {
+            .bubble-user {
                 margin: 0 2% 0 auto;
                 position: relative;
                 width: 40px; 
-                aspect-ratio: 1 / 1;
                 background-color: rgb(87, 87, 87);
-                border-radius: 50%;
             }
-            .image > p {               
-                font-weight: 500;
-                font-size: 1.4rem;
+            [class |= "bubble"] {
+                border-radius: 50%;
+                aspect-ratio: 1 / 1;
+            }
+            .center {
                 position: absolute;
                 top: 50%;
                 left: 50%;
                 transform: translate(-50%, -50%);
-            }   
+            }
+            .bubble-sender {
+                background-color: rgb(11, 68, 90);
+                height: 80%;
+                flex: 0 0 auto;
+                position: relative;
+            }  
+            td:has(.bubble-sender) {
+                justify-content: flex-start;
+            }
 
             .search_bar > input {
                 width: 80%;
@@ -103,45 +105,98 @@
             }
 
             .search_bar:has(input:focus) {
-                background-color: rgb(255, 255, 255);
-            }
-
-            .sender_image {
-                background-color: red;
-                aspect-ratio: 1 / 1;
-                width: 40px;
-                border-radius: 50%;
-                margin-right: 15px;
-                flex: 0 0 auto;
-            }
-            .sixth > div {
-                color: white
+                background-image: linear-gradient(to right, rgb(61, 61, 61), rgb(44, 44, 82));
             }
             tr {
-                margin-left: 15px;
+                margin: 0 15px 22px 15px;
+                gap: 10px
+            }
+            td {
+                height: 55px;
+                align-items: flex-start;
+                border: none;
+            }
+
+            .sixth {
+                align-content: flex-start;
+                flex-wrap: wrap;
+            }
+            .menu {
+                display: flex;
+                flex-flow: column nowrap;
+                justify-content: space-between;
+                font-size: small;
+                white-space: nowrap;
+                align-items: center;
+            }
+            .sixth > div {
+                width: 100%;
+                text-align: start;
+                font-size: small;
+                position: relative;
+                margin-top: -2px;
+            }
+            .dark {
+                color: rgb(148, 148, 148);
+            }
+            .light {
+                color: rgb(218, 209, 209)
+            }
+            .p {
+                margin: 20px 0 20px 15px;
             }
         </style>
         <title>Homepage</title>
     </head>
     <body>            
         <div class="grid">
-            <div class="top box">
+            <div class="top">
                 <form class="search_bar" action="/null" method="get">
-                    <div class="bubble"><i class="gg-menu"></i></div>
+                    <div class="bubble"><i class="gg-menu light"></i></div>
                     <input placeholder="Search in emails">
-                    <div class="image"><p>H</p></div>
+                    <div class="bubble-user"><p class="center light">H</p></div>
                 </form>
-                <p>Primary</p>  
+                <p class="dark small p">Primary</p>  
             </div>         
-            <div class="left box">
+            <div class="left">
                 1
             </div>
-            <div class="right box">
+            <div class="right">
                 <table>     
                     <tr class="hover">
-                        <td class="sender_image"></td>
+                        <td><div class="bubble-sender"><div class="center light">H</div></div></td>
                         <td class="sixth">
-                            <div class="message">A personal access token (classic) 'For accessing Repo' with repo scope was recentl</div>
+                            <div class="sender fw-bold light">ZipRecuiter</div>
+                            <div class="title fw-bold light">Did you see thes 100$?</div>
+                            <div class="message small fw-normal dark"></div>
+                        </td>
+                        <td class="menu">
+                            <div class="date small light fw-bold">9 Dec</div>
+                            <i class="gg-more-vertical-o dark"></i>
+                        </td>
+                    </tr>
+                    <tr class="hover">
+                        <td><div class="bubble-sender"><div class="center light">H</div></div></td>
+                        <td class="sixth">
+                            <div class="sender fw-bold light">ZipRecuiter</div>
+                            <div class="title fw-bold light">Did you see thes 100$?</div>
+                            <div class="message small fw-normal dark"></div>
+                        </td>
+                        <td class="menu">
+                            <div class="date small light fw-bold">9 Dec</div>
+                            <i class="gg-more-vertical-o dark"></i>
+                        </td>
+                    </tr>
+                    <tr class="hover">
+                        <td><div class="bubble-sender"><div class="center light">H</div></div></td>
+                        <td class="sixth">
+                            <div class="sender fw-bold light">ZipRecuiter</div>
+                            <div class="title fw-bold light">Did you see thes 100$?</div>
+                            <div class="message small fw-normal dark"></div>
+                        </td>
+                        <td class="menu">
+                            <div class="date small light fw-bold">9 Dec</div>
+                            <i class="gg-more-vertical-o dark"></i>
                         </td>
                     </tr>
                 </table>  
