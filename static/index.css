@@ -28,6 +28,143 @@ table {
     white-space: nowrap;
     text-overflow: ellipsis;
 }
+body {
+    background-image: linear-gradient(to right, rgb(46, 42, 42), rgb(33, 33, 59));
+}
+.grid {
+    grid-template-columns: 100%;
+    grid-template-rows: auto 1fr;
+}
+.left {
+    display: none;
+}
+
+.top {
+    display: flex;
+    align-items: center;
+    flex-flow: row wrap;
+}
+
+.search_bar {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    height: 60px;
+    border-radius: 30px;
+    background-image: linear-gradient(to right, rgb(60, 60, 60), rgb(33, 33, 59));
+    margin: 15px 15px 0 15px;
+    margin-bottom: 0px;
+    box-shadow: 0 0 10px 4px rgba(49, 49, 49, 0.438);
+}
+
+.bubble {
+    height: 70%;
+    aspect-ratio: 1 / 1;
+    margin: 0 5px 0 10px;
+    display: flex;
+    align-items: center;
+    border-radius: 50%;
+    justify-content: center;
+}
+.bubble:hover {
+    background-color: rgb(92, 92, 92);
+    transition-duration: 0.2s;
+}
+.basic {
+    display: flex;
+    flex: 1 1 0px;
+    align-items: center;
+    height: 100%;
+}    
+.basic > h4 {
+    margin: 0;
+}
+
+.user {
+    position: relative;
+    flex: 1 1 0px;
+}
+.bubble-user {
+    margin: 0 2% 0 auto;
+    position: relative;
+    width: 40px; 
+    background-color: rgb(87, 87, 87);
+}
+[class |= "bubble"] {
+    border-radius: 50%;
+    aspect-ratio: 1 / 1;
+}
+.center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.bubble-sender {
+    background-color: rgb(11, 68, 90);
+    height: 80%;
+    flex: 0 0 auto;
+    position: relative;
+}  
+td:has(.bubble-sender) {
+    justify-content: flex-start;
+}
+
+.search_bar > input {
+    width: 80%;
+    background-color: inherit;
+    border: none;
+    outline: none;
+}
+
+.search_bar > i {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.search_bar:has(input:focus) {
+    background-image: linear-gradient(to right, rgb(61, 61, 61), rgb(44, 44, 82));
+}
+tr {
+    display: flex;
+    margin: 0 15px 22px 15px;
+    gap: 10px
+}
+td {
+    display: flex;
+    height: 55px;
+    align-items: flex-start;
+    border: none;
+}
+
+.sixth {
+    align-content: flex-start;
+    flex-wrap: wrap;
+}
+.menu {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: space-between;
+    font-size: small;
+    white-space: nowrap;
+    align-items: center;
+}
+.sixth > div {
+    width: 100%;
+    text-align: start;
+    font-size: small;
+    position: relative;
+    margin-top: -2px;
+}
+.dark {
+    color: rgb(148, 148, 148);
+}
+.light {
+    color: rgb(218, 209, 209)
+}
+.p {
+    margin: 20px 0 20px 15px;
+}
 
 
 @media screen and (min-width: 768px) {
