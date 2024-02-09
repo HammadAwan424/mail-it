@@ -18,7 +18,7 @@
     </head>
     <body>      
         {% block body %}      
-        <div class="grid hidden-sidebar">
+        <div class="grid">
             <div class="child" style="grid-column: 1 / 3;">
                 <div class="top">
                     <div class="basic no-mobile light">
@@ -41,7 +41,7 @@
                     <p class="dark small p no-desktop">Primary</p>  
                 </div>     
             </div>    
-            <div class="left hidden">
+            <div class="left box">
                 1
             </div>
             <div class="right">
@@ -110,8 +110,7 @@
 
             /* PC */
             document.querySelector(".basic > .bubble").addEventListener("click", function() {
-                document.querySelector(".left").classList.toggle("hidden") 
-                document.querySelector(".grid").classList.toggle("hidden-sidebar")
+                document.querySelector(".left").classList.toggle("animate") 
             })
 
             // Mobile

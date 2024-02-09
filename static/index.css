@@ -217,18 +217,24 @@ td {
     .grid {
         display: grid;
         min-height: 100%;
-        grid-template-columns: 20% auto;
+        grid-template-columns: auto auto;
         grid-template-rows: auto 1fr;
     }
-    .hidden-sidebar {
-        grid-template-columns: 100%;
+    @keyframes slideAnimation {
+        0% { width: 0; }
+        100% { width: 20vw }
+    }
+    .animate {
+        animation: slideAnimation 0.3s ease forwards;
     }
     .right {
         overflow: hidden;
     }
     .left {
+        transition: all 10s ease;
         display: block;
         background-color: rgba(0, 0, 0, 0.1);
+        width: 0
     }
     .box {
         text-align: center;
