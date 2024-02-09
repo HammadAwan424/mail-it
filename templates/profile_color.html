@@ -1,0 +1,92 @@
+{% extends "index.html" %}
+
+{% block title %}
+    Setting up
+{% endblock %}
+
+{% block style %}
+<style>
+    body {
+        --form-range-track-width: 30%;
+    }
+    h1 {
+        padding: 3rem;
+        white-space: pre-wrap;
+    }
+    .circle {
+        width: 40%;
+        aspect-ratio: 1 / 1;
+        border-radius: 50%;
+        position: relative;
+        margin: auto;
+        container-type: size;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .char {
+        font-size: 80cqw;
+        margin-bottom: 10cqw;
+    }
+    .flex {
+        display: flex;
+        flex-flow: column wrap;
+        gap: 30px
+    }
+    .small {
+        display: flex;
+        justify-content: center;
+        flex-flow: row wrap;
+        gap: 20px
+    }
+    input {
+        width: 30% !important; 
+    }
+    button {
+        width: 150px;
+        height: 40px;
+        border: 2px solid;
+        border-radius: 30px;
+        background-color: rgb(33, 33, 59);
+    }
+    form {
+        margin: 0 auto;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+    <h1 class="light">Hi {{session.get("username").title()}}! just a small Set-up...</h1>
+    <div class="flex">
+        <div class="circle light"><div class="char">{{session.get("username").title()[0]}}</div></div>
+        <div class="small">
+            <input class="form-range" type="range" min="0" max="256">
+            <input class="form-range" type="range" min="0" max="256">
+            <input class="form-range" type="range" min="0" max="256">
+        </div>
+        <form action="/user-profile" method="post">
+            <input type="hidden" id="value" name="color">
+            <button type="submit" class="light">Let's goo</button>
+        </form>
+    </div>
+
+    <script>
+        let elems = document.querySelectorAll("input[type='range']")
+        let circle = document.querySelector(".circle")
+        let input_field = document.getElementById("value")
+        elems.forEach(function(elem) {
+                elem.value = Math.random() * 256
+                circle.style.backgroundColor = `rgb(${elems[0].value}, ${elems[1].value}, ${elems[2].value})`
+                value.value = `rgb(${elems[0].value}, ${elems[1].value}, ${elems[2].value})`
+                elem.addEventListener("input", function() {
+                    modifier(elems, circle, input_field)
+                })
+            })
+        function modifier(arr, shape, field) {
+            let str = `rgb(${arr[0].value}, ${arr[1].value}, ${arr[2].value})`
+            shape.style.backgroundColor = str
+            field.value = str
+        }
+    </script>
+{% endblock %}
+
