@@ -1,197 +1,193 @@
-<!DOCTYPE html>
+{% extends "index.html" %}
 
-<html>
-    <head>
-        <title>{% block title %}Login{% endblock %}</title>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+{% block title %}
+    Login
+{% endblock %}
         
-        <style>
+{% block style %}
+<style>
 
-            body {
-                background-image: linear-gradient(to right, rgb(87, 150, 231), rgb(219, 26, 145));
-            }
+    h2 {
+        padding-top: 50px;
+        font-family: Arial;
+        font-weight: bold;
+        flex: 1 1 auto;
+    }
+        
+    
+    input {
+        background-color: inherit;
+        width: 100%;
+        padding: 5px 0px;
+        border: none;
+        border-bottom: 1px solid rgb(204, 204, 204);
+        outline: none;
+    }
+    input:focus {
+        border-color: rgb(255, 255, 255);
+        box-shadow: 0 6px 8px -8px rgb(184, 180, 180);
+    }
+    input:focus::placeholder {
+        color: rgb(218, 209, 209)
+    }
 
-            h2 {
-                padding-top: 50px;
-                font-family: Arial;
-                font-weight: bold;
-                flex: 1 1 auto;
-            }
-               
-            
-            input {
-                width: 100%;
-                padding: 5px 0px;
-                border: none;
-                border-bottom: 1px solid rgb(116, 116, 116);
-                outline: none;
-            }
+    .inputcontainer {
+        width: 80%;
+        margin: auto;
+        display: flex;
+        flex-flow: column nowrap;           
+    }
+    
+    p {
+        margin: 0;
+        text-align: left;
+        font-size: 12px;
+    }
 
-            input:focus {
-                border-color: rgb(0, 0, 0);
-                box-shadow: 0 6px 8px -8px black;
-            }
+    form {
+        flex: 7 1 auto;
+        
+    }
+    
+    .xcenter {
+        text-align: center;
+    }
 
-            .inputcontainer {
-                width: 80%;
-                margin: auto;
-                display: flex;
-                flex-flow: column nowrap;           
-            }
-            
-            p {
-                margin: 0;
-                text-align: left;
-                font-size: 12px;
-            }
+    .containerr {
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        border-radius: 4px;
+        width: 100%;
+        text-align: center;
+        margin: auto;
+        aspect-ratio: 3 / 5;
+        position: absolute;
+        top: 50%;
+        transform: translate(0, -50%);
+        box-shadow: 0 0 8px 3px rgba(0, 0, 0, 0.4);
+    }
 
-            form {
-                flex: 7 1 auto;
-                
-            }
-            
-            .center {
-                text-align: center;
-            }
+    .custom_button {
+        width: 100%;
+        background-image: linear-gradient(to right, rgb(18, 184, 234), rgb(222, 87, 192));
+        border: none;
+        border-radius: 20px;
+        padding: 6px 0;
+    }
 
-            .containerr {
-                display: flex;
-                flex-direction: column;
-                background-color: white;
-                position: relative;
-                border-radius: 4px;
-                width: 100%;
-                height: 100%;
-                text-align: center;
-                margin: auto;
-            }
+    .custom_button:disabled {
+        color: rgba(0, 0, 0, 0.8);
+        opacity: 0.7
+    }
 
-            .custom_button {
-                width: 100%;
-                background-image: linear-gradient(to right, rgb(18, 184, 234), rgb(222, 87, 192));
-                border: none;
-                border-radius: 20px;
-                padding: 6px 0;
-            }
-
-            .custom_button:disabled {
-                color: rgba(0, 0, 0, 0.8);
-                opacity: 0.7
-            }
-
-        </style>    
-
-        <style>
-            html, body {
-                height: 100%;
-                margin: 0;
-            }
-
-
-            .vertical {
-                margin: 0 1rem;
-                display: flex;
-                flex-direction: column;
-                height: 100%;
-            }
+    html, body {
+        height: 100%;
+        margin: 0;
+    }
 
 
-            .inner {
-                flex: 1 1 auto;
-                aspect-ratio: 3/5;
-                margin: 3rem auto;
-                max-width: 100%;
-            }
-
-            .widther {
-                aspect-ratio: 3/5;
-            }
-        </style>
-
-        <script>
-
-            'defines subfunction for updating target span(string) on bases of length of source(element)'
-            function subfunction(element_source, id_target_span) {
-                let span = document.getElementById(id_target_span);
-                span.innerHTML = element_source.value.length
-                if (element_source.value.length < 8) {
-                span.style.color = "rgb(200, 0, 0)"
-                }
-                else {
-                span.style.color = "rgb(0, 200, 0)"
-                };
-            }
+    .vertical {
+        margin: 0 1rem;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
 
 
-            'defines a function which updates a <p> tag on basis of length of <input> tag'
-            function checker(password, par) {
-                let element = document.getElementById(password)
-                element.addEventListener("focus", function(){
-                    document.getElementById(par).innerHTML = 'Atleast 8 characters, current <span style="font-weight: bold" id="span">0</span>.'
-                    subfunction(element, "span")
-                });
+    .inner {
+        flex: 1 1 auto;
+        aspect-ratio: 3/5;
+        margin: 3rem auto;
+        max-width: 100%;
+        position: relative;
+    }
+</style>
+{% endblock %}
 
-                'Modifies the span'
-                element.addEventListener("keyup", function(){
-                    subfunction(element, "span")
-                });
-            }
-
-            'Changes button for registration/login'
-                function disabler(button, ...args) {
-                    let btn = document.getElementById(button)
-                    let collective_count = []
-                    for (let i = 0; i < args.length; i++) {
-                        collective_count[i] = 0
-                        field = document.getElementById(args[i])
-                        field.addEventListener("keyup", (function(tmp_field, tmp_i) {
-                            return function() {
-                                collective_count[tmp_i] = tmp_field.value.length
-                                if (collective_count.every((el)=>{return el >= 8}))
-                                {
-                                    btn.disabled = false
-                                }
-                                else {btn.disabled = true}
-                                console.log(collective_count)
-                            }
-                        })(field, i))
-                    }
-                }
-
-        </script>
-
-        {% block script %}
-            <script>
-                'Uses the above function'
-                document.addEventListener("DOMContentLoaded", function(){
-                    checker("password", "par")
-                    disabler("btn", "password")
-                });
-            </script>
-        {% endblock %}
-    </head>
-    <body>
+{% block body %}
         <div class="vertical">
             <div class="inner">
-                <div class="widther">
-                    <div class="containerr">
-                        {% block container %}
-                            <h2>Login</h2>
-                            <form action="/login" method="post">
-                                <div class="inputcontainer">
-                                    <p>Username</p>
-                                    <input autocomplete="off" type="text" name="username" placeholder="Type your username"> <br>
-                                    <p>Password</p>
-                                    <input autocomplete="off" id="password" type="password" name="pass" placeholder="Type your password"> <br>
-                                    <p class="small center" id="par"></p> <br>
-                                    <button id="btn" type="submit" class="custom_button" disabled>Login</button>
-                                </div>
-                            </form>
-                            <p class="footer center mb-3">Or Register Using <br><a href="/register">Register</a></p>
-                        {% endblock %}
-                    </div>
+                <div class="containerr dark">
+                    {% block container %}
+                        <h2 class="light">Login</h2>
+                        <form action="/login" method="post">
+                            <div class="inputcontainer">
+                                <p class="light">Username</p>
+                                <input autocomplete="off" type="text" name="username" placeholder="Type your username"> <br>
+                                <p class="light">Password</p>
+                                <input autocomplete="off" id="password" type="password" name="pass" placeholder="Type your password"> <br>
+                                <p class="small xcenter" id="par"></p> <br>
+                                <button id="btn" type="submit" class="custom_button" disabled>Login</button>
+                            </div>
+                        </form>
+                        <p class="footer xcenter mb-3">Or Register Using <br><a href="/register">Register</a></p>
+                    {% endblock %}
                 </div>
             </div>
         </div>
-    </body>     
-</html>
+
+<script>
+
+    'defines subfunction for updating target span(string) on bases of length of source(element)'
+    function subfunction(element_source, id_target_span) {
+        let span = document.getElementById(id_target_span);
+        span.innerHTML = element_source.value.length
+        if (element_source.value.length < 8) {
+        span.style.color = "rgb(200, 0, 0)"
+        }
+        else {
+        span.style.color = "rgb(0, 200, 0)"
+        };
+    }
+
+
+    'defines a function which updates a <p> tag on basis of length of <input> tag'
+    function checker(password, par) {
+        let element = document.getElementById(password)
+        element.addEventListener("focus", function(){
+            document.getElementById(par).innerHTML = 'Atleast 8 characters, current <span style="font-weight: bold" id="span">0</span>.'
+            subfunction(element, "span")
+        });
+
+        'Modifies the span'
+        element.addEventListener("keyup", function(){
+            subfunction(element, "span")
+        });
+    }
+
+    'Changes button for registration/login'
+        function disabler(button, ...args) {
+            let btn = document.getElementById(button)
+            let collective_count = []
+            for (let i = 0; i < args.length; i++) {
+                collective_count[i] = 0
+                field = document.getElementById(args[i])
+                field.addEventListener("keyup", (function(tmp_field, tmp_i) {
+                    return function() {
+                        collective_count[tmp_i] = tmp_field.value.length
+                        if (collective_count.every((el)=>{return el >= 8}))
+                        {
+                            btn.disabled = false
+                        }
+                        else {btn.disabled = true}
+                        console.log(collective_count)
+                    }
+                })(field, i))
+            }
+        }
+
+</script>
+
+    {% block uniquescript %}
+    <script>
+        'Uses the above function'
+        document.addEventListener("DOMContentLoaded", function(){
+            checker("password", "par")
+            disabler("btn", "password")
+        });
+    </script>
+    {% endblock %}
+
+{% endblock %}
+

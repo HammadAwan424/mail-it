@@ -7,108 +7,126 @@
         <link href="https://css.gg/css" rel="stylesheet">
         <link href="../static/index.css" rel="stylesheet">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Homepage</title>
+        <title>{% block title %}Homepage{% endblock %}</title>
+        {% block style %}
+        <style>
+            .bubble-user {
+                background-color: {{user.color}};
+            }
+        </style>
+        {% endblock %}
     </head>
-    <body>            
-        <div class="grid">
-            <div class="top">
-                <form class="search_bar" action="/null" method="get">
-                    <div class="bubble"><i class="gg-menu light"></i></div>
-                    <input placeholder="Search in emails">
-                    <div class="bubble-user"><p class="center light">H</p></div>
-                </form>
-                <p class="dark small p">Primary</p>  
-            </div>         
-            <div class="left">
+    <body>      
+        {% block body %}      
+        <div class="grid hidden-sidebar">
+            <div class="child" style="grid-column: 1 / 3;">
+                <div class="top">
+                    <div class="basic no-mobile light">
+                        <div class="bubble"><i class="gg-menu"></i></div>
+                        <h4>Mail</h4>
+                    </div>
+                    <form class="search_bar" action="/null" method="get">
+                        <div class="bubble-menu no-desktop"><i class="gg-menu light center"></i></div>
+                        <i class="gg-search no-mobile"></i>
+                        <input placeholder="Search in emails">
+                        <div class="bubble-user no-desktop"><p class="center light">{{ session.get("username").title()[0] }}</p></div>
+                    </form>
+                    <div class="user no-mobile"><div class="bubble-user"><p class="center fw-bold">{{ session.get("username").title()[0] }}</p></div></div>
+                    <div class="topbar hidden">
+                        <span>5 items Selected</span>
+                        <div class="space" style="flex: 25 1 450px"></div>
+                        <div><i class="gg-trash black"></i></div>
+                        <div><i class="gg-check-r black"></i></div>
+                    </div>
+                    <p class="dark small p no-desktop">Primary</p>  
+                </div>     
+            </div>    
+            <div class="left hidden">
                 1
             </div>
             <div class="right">
-                <table>     
-                    <tr class="hover">
-                        <td><div class="bubble-sender"><div class="center light">H</div></div></td>
-                        <td class="sixth">
-                            <div class="sender fw-bold light">ZipRecuiter</div>
-                            <div class="title fw-bold light">Did you see thes 100$?</div>
-                            <div class="message small fw-normal dark"></div>
-                        </td>
-                        <td class="menu">
-                            <div class="date small light fw-bold">9 Dec</div>
-                            <i class="gg-more-vertical-o dark"></i>
-                        </td>
-                    </tr>
-                    <tr class="hover">
-                        <td><div class="bubble-sender"><div class="center light">H</div></div></td>
-                        <td class="sixth">
-                            <div class="sender fw-bold light">ZipRecuiter</div>
-                            <div class="title fw-bold light">Did you see thes 100$?</div>
-                            <div class="message small fw-normal dark"></div>
-                        </td>
-                        <td class="menu">
-                            <div class="date small light fw-bold">9 Dec</div>
-                            <i class="gg-more-vertical-o dark"></i>
-                        </td>
-                    </tr>
-                    <tr class="hover">
-                        <td><div class="bubble-sender"><div class="center light">H</div></div></td>
-                        <td class="sixth">
-                            <div class="sender fw-bold light">ZipRecuiter</div>
-                            <div class="title fw-bold light">Did you see thes 100$?</div>
-                            <div class="message small fw-normal dark"></div>
-                        </td>
-                        <td class="menu">
-                            <div class="date small light fw-bold">9 Dec</div>
-                            <i class="gg-more-vertical-o dark"></i>
-                        </td>
-                    </tr>
+                <table>
+                    {%- for mail in mails %}
+                        <tr class="hover">
+                            <td class="no-desktop"><div class="bubble-sender"><div class="center light">{{ mail.sender[1].title()[0] }}</div></div></td>
+
+                            <td class="no-mobile first icons"><div class="main"><input type="checkbox" class="form-check-input" id="checkbox1"></div></td>
+                            <td class="no-mobile second fw-bold"><label class="black" for="checkbox1">{{ mail.sender[1].title() }}</label></td>
+                            <td class="no-mobile third icons side"><div class="main"><i class="gg-trash black"></i></div></td>
+                            <td class="no-mobile fourth icons"><div class="main"><i class="gg-check-r black"></i></div></td>
+                            <td class="no-mobile fifth icons"><div class="main"><i class="gg-more-vertical-alt black"></i></td>
+
+                            <td class="sixth">
+                                <div class="no-desktop sender fw-bold light">{{ mail.sender[1].title() }}</div>
+                                <div class="no-desktop title fw-bold light">Did you see thes 100$?</div>
+                                <div class="no-desktop message small fw-normal dark">{{ mail.message }}</div>
+                                <div id="child" class="no-mobile black message">{{ mail.message }}</div>
+                            </td>
+
+                            <td class="menu">
+                                <div class="date small light fw-bold" title="{{ mail.time }}">{{ mail.date | format }}</div>
+                                <i class="no-desktop gg-more-vertical-o dark"></i>
+                            </td>
+                        </tr>
+                    {%- endfor %}
                 </table>  
+                <div class="sidebar no-desktop hidden"></div>
             </div>            
         </div>
     </body>
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            text_elems = document.getElementsByClassName("message")
-            let message = "A personal access token (classic) 'For accessing Repo' with repo scope was recently added to youraccou raccount. Visit https: //github .com/ setting s/tokens  for more information."
-            for (let elem of text_elems) {
-                elem.innerHTML = message
-            }            
-
             checkboxes = document.getElementsByClassName("form-check-input")
             for (let i = 0; i < checkboxes.length; i++) {
                 checkboxes[i].addEventListener("change", function() {
-                    email_selector(checkboxes[i])
+                    let tr = checkboxes[i].closest("tr")
+                    tr.classList.toggle("selection")
+                    let total = 0
+                    for (let j = 0; j < checkboxes.length; j++) {
+                        if (checkboxes[j].checked == true) {total += 1}
+                    }
+                    if (total > 0) {
+                        document.querySelector(".topbar").classList.remove("hidden")
+                        document.querySelector(".topbar > span").innerHTML = `${total} items selected`
+                    }
+                    else {document.querySelector(".topbar").classList.add("hidden")}
                 })
             }
 
-            function email_selector(checkbox) {
-                let tr = checkbox.closest("tr")
-                tr.classList.toggle("selection")
-            }
 
             function deleter() {
                 let trash_icons = document.getElementsByClassName("third")
 
                 for (let icon of trash_icons) {
                     icon.addEventListener("click", function() {
-                        /*
-                        let tr = this.closest("tr");
-                        let i = 0;
-                        let id = setInterval(function() {
-                            tr.style.left = i + "%";
-                            if (i >= 100) {
-                                clearInterval(id);
-                                tr.style.display = "none"
-                            }
-                            i += 2;
-                        }, 1) */
                         let tr = this.closest("tr")
                         tr.children[2].classList.remove("side")
                         tr.classList.add("delete")
                     }) 
                 }
             }
-
             deleter()
+
+            /* PC */
+            document.querySelector(".basic > .bubble").addEventListener("click", function() {
+                document.querySelector(".left").classList.toggle("hidden") 
+                document.querySelector(".grid").classList.toggle("hidden-sidebar")
+            })
+
+            // Mobile
+            document.querySelector(".search_bar > .bubble-menu").addEventListener("click", function() {
+                let bar = document.querySelector(".sidebar")
+                bar.classList.remove("hidden")
+                window.onclick = (pointer) => {
+                    if (pointer.clientX > bar.getBoundingClientRect().right) {
+                        console.log("You clicked right to the sidebar")
+                        bar.classList.add("hidden")
+                        window.onclick = null
+                    }
+                }
+            })
         })
     </script>
+    {% endblock %}
 </html>

@@ -13,7 +13,7 @@ def login(f):
             return f(*args,  **kwargs)
     return inner
 
-engine = create_engine("sqlite:///database.db")
+engine = None
 
 metadata = MetaData()
 
@@ -22,7 +22,8 @@ users = Table(
     metadata,
     Column("id", Integer, primary_key=True),
     Column("username", String(30)), #uniqute constraint
-    Column("password", String)
+    Column("password", String),
+    Column("color", String)
 )
 
 mails = Table(
@@ -32,7 +33,7 @@ mails = Table(
     Column("text", String),
     Column("sender", ForeignKey("users.id"), nullable=False),
     Column("receiver", ForeignKey("users.id"), nullable=False),
-    Column("date", DATE), #dates in alchemy 
+    Column("date", DATE),
     Column("time", TIME(storage_format="%(hour)02d:%(minute)02d:%(second)02d")),   
     Column("read", Boolean, default=False)
 )
@@ -52,20 +53,38 @@ class Email:
         cls.engine = engine
 
     @classmethod
-    def all(cls, user_id):
+    def all(cls, user_receiver=None, user_sender=None):
+        '''Pass any one of the kwargs'''
+        #if receiver is given, then below is executed
         engine_checker(cls)
+        column = "receiver"
+        col_secondary = "sender"
+        query = user_receiver
+
+        if not user_receiver:
+            query = user_sender
+            column = 'sender'
+            col_secondary = "receiver"
+
         emails = []
         with cls.engine.connect() as conn:
-            stmt = select(mails).filter_by(id=user_id)
+
+            stmt = select(mails, users).where(mails.c[column]==query).join(users, mails.c[col_secondary]==users.c.id)
             result = conn.execute(stmt)
-            for row in result:               
-                emails.append(Email(row.text, row.sender, row.receiver, id=row.id, date=row.date, time=row.time, read=row.read))
-        return emails
+            if not user_sender:
+                for row in result:               
+                    emails.append(Email(row.text, (row.sender, row.username), row.receiver, id=row.id, date=row.date, time=row.time, read=row.read))
+                return emails
+            for row in result:
+                emails.append(Email(row.text, row.sender, (row.receiver, row.username), id=row.id, date=row.date, time=row.time, read=row.read))
+            return emails
+        
+
     
     @classmethod
     def read(self, mail_id, user_id):
         engine_checker(self)
-        stmt = update(mails).values(read=True).where(mails.c.id == mail_id, mails.c.receiver == user_id, exists().where(users.c.id == user_id))
+        stmt = update(mails).values(read=True).where(mails.c.id == mail_id, mails.c.receiver == user_id)
         with self.engine.begin() as conn:
             conn.execute(stmt)
 
@@ -83,8 +102,13 @@ class Email:
         with self.engine.begin() as conn:
             stmt = insert(mails).values(text=self.message, sender=self.sender, receiver=self.receiver, date=self.date, time=self.time)            
             conn.execute(stmt)
-            conn.execute(select(users.username).filter_by(or_(id = self.receiver, id=self.sender)))
-        logging.info(f"Email sent from {self.sender} to {self.receiver}")
+
+            tmp = conn.execute(select(users.c.id, users.c.username).where(or_(users.c.id == self.receiver, users.c.id == self.sender))).fetchall()
+            sender, receiver = (tmp[0][1], tmp[1][1]) if tmp[0][0] == self.sender else (tmp[1][1], tmp[0][1])
+            logging.info(f"Email sent from {sender.title()} to {receiver.title()}")
+
+def date(date):
+    return date.strftime("%d %b")
 
 if __name__ == "__main__":
     print("Metadata was called")
