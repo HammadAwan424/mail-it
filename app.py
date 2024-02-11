@@ -3,6 +3,7 @@ from flask_session import Session
 from helpers import login, users, mails, Email, date
 import logging
 from sqlalchemy import insert, create_engine, exists, select, update
+import json
 
 
 app = Flask(__name__)
@@ -38,7 +39,14 @@ def index():
         #prepares page and returns it
         user = conn.execute(select(users).filter_by(id=session.get("id"))).first()
         mails = Email.all(user_receiver=session.get("id"))
-        return render_template("index.html", mails=mails, user=user)
+
+        # manages json
+        arr = []
+        for mail in mails:
+            arr.append(mail.__dict__)
+        json_mails = json.dumps(arr, default=str, indent=2)
+
+        return render_template("index.html", mails=mails, user=user, json_mails=json_mails)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():

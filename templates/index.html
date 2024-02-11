@@ -19,78 +19,104 @@
     <body>      
         {% block body %}      
         <div class="grid">
-            <div class="child" style="grid-column: 1 / 3;">
-                <div class="top">
-                    <div class="basic no-mobile light">
-                        <div class="bubble"><i class="gg-menu"></i></div>
-                        <h4>Mail</h4>
-                    </div>
-                    <form class="search_bar" action="/null" method="get">
-                        <div class="bubble-menu no-desktop"><i class="gg-menu light center"></i></div>
-                        <i class="gg-search no-mobile"></i>
-                        <input placeholder="Search in emails">
-                        <div class="bubble-user no-desktop"><p class="center light">{{ session.get("username").title()[0] }}</p></div>
-                    </form>
-                    <div class="user no-mobile"><div class="bubble-user"><p class="center fw-bold">{{ session.get("username").title()[0] }}</p></div></div>
-                    <div class="topbar hidden">
-                        <span>5 items Selected</span>
-                        <div class="space" style="flex: 25 1 450px"></div>
-                        <div><i class="gg-trash black"></i></div>
-                        <div><i class="gg-check-r black"></i></div>
-                    </div>
-                    <p class="dark small p no-desktop">Primary</p>  
-                </div>     
-            </div>    
-            <div class="left box">
+            <div class="top">
+                <div class="basic no-mobile light">
+                    <div class="bubble"><i class="gg-menu"></i></div>
+                    <h4>Mail</h4>
+                </div>
+                <form class="search_bar" action="/null" method="get">
+                    <div class="bubble-menu no-desktop"><i class="gg-menu light center"></i></div>
+                    <i class="gg-search no-mobile"></i>
+                    <input class="light" placeholder="Search in emails">
+                    <div class="bubble-user no-desktop"><p class="center light">{{ session.get("username").title()[0] }}</p></div>
+                </form>
+                <div class="user no-mobile"><div class="bubble-user"><p class="center fw-bold">{{ session.get("username").title()[0] }}</p></div></div>
+                <p class="dark small p no-desktop">Primary</p>  
+            </div> 
+            <div class="left">
                 1
             </div>
             <div class="right">
+                <div class="topbar light no-mobile">
+                    <div class="main"><input type="checkbox" class="form-check-input icon" id="all-checkboxes"></div>
+
+                    <div class="onselection f-b hidden">
+                        <div class="rect mr"><span>5 items Selected</span></div>
+                        <div class="main mr icon"><i class="gg-trash black"></i></div>
+                        <div class="main mr icon"><i class="gg-check-r black"></i></div>
+                        <div class="main mr icon"><i class="gg-more-vertical-alt black"></i></div>
+                    </div>
+                    <div class="space"></div>
+                    <div class="last f-b small">
+                        <div class="rect small">1-50 of 104</div>
+                        <div class="main icon">&lt;</div>
+                        <div class="main icon">&gt;</div>
+                    </div>
+                    
+                </div>
                 <table>
                     {%- for mail in mails %}
                         <tr class="hover">
-                            <td class="no-desktop"><div class="bubble-sender"><div class="center light">{{ mail.sender[1].title()[0] }}</div></div></td>
+                            <td class="no-desktop"><div class="bubble-sender" style="background-color: {{mail.sender[2]}};"><div class="center light">{{ mail.sender[1].title()[0] }}</div></div></td>
 
-                            <td class="no-mobile first icons"><div class="main"><input type="checkbox" class="form-check-input" id="checkbox1"></div></td>
-                            <td class="no-mobile second fw-bold"><label class="black" for="checkbox1">{{ mail.sender[1].title() }}</label></td>
-                            <td class="no-mobile third icons side"><div class="main"><i class="gg-trash black"></i></div></td>
-                            <td class="no-mobile fourth icons"><div class="main"><i class="gg-check-r black"></i></div></td>
-                            <td class="no-mobile fifth icons"><div class="main"><i class="gg-more-vertical-alt black"></i></td>
+                            <td class="no-mobile first"><div class="main"><input type="checkbox" class="form-check-input icon" id="checkbox{{loop.index}}"></div></td>
+                            <td class="no-mobile second fw-bold"><label class="black overflow" for="checkbox{{loop.index}}">{{ mail.sender[1].title() }}</label></td>
+                            <td class="no-mobile third icon side"><div class="main"><i class="gg-trash black"></i></div></td>
+                            <td class="no-mobile fourth icon"><div class="main"><i class="gg-check-r black"></i></div></td>
+                            <td class="no-mobile fifth icon"><div class="main"><i class="gg-more-vertical-alt black"></i></td>
 
-                            <td class="sixth">
-                                <div class="no-desktop sender fw-bold light">{{ mail.sender[1].title() }}</div>
-                                <div class="no-desktop title fw-bold light">Did you see thes 100$?</div>
-                                <div class="no-desktop message small fw-normal dark">{{ mail.message }}</div>
-                                <div id="child" class="no-mobile black message">{{ mail.message }}</div>
+                            <td class="sixth overflow">
+                                <div class="no-desktop sender fw-bold light overflow">{{ mail.sender[1].title() }}</div>
+                                <div class="no-desktop title fw-bold light overflow">Did you see thes 100$?</div>
+                                <div class="no-desktop message small fw-normal dark overflow">{{ mail.message }}</div>
+                                <div id="child" class="no-mobile black message overflow">{{ mail.message }}</div>
                             </td>
 
                             <td class="menu">
-                                <div class="date small light fw-bold" title="{{ mail.time }}">{{ mail.date | format }}</div>
+                                <div class="date small light fw-bold mr"></div>
                                 <i class="no-desktop gg-more-vertical-o dark"></i>
                             </td>
                         </tr>
                     {%- endfor %}
                 </table>  
-                <div class="sidebar no-desktop hidden"></div>
+                <div class="sidebar no-desktop"></div>
             </div>            
         </div>
     </body>
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            checkboxes = document.getElementsByClassName("form-check-input")
+            checkboxes = document.querySelectorAll("td .form-check-input")
+            document.getElementById("all-checkboxes").addEventListener("change", function() {
+                if (this.checked) {
+                    checkboxes.forEach(function(box) {
+                        if (!box.checked) {box.click()}
+                    })
+                }
+                else {checkboxes.forEach(function(box) {
+                    box.click()
+                })}
+            })
+
+            let total = 0
             for (let i = 0; i < checkboxes.length; i++) {
                 checkboxes[i].addEventListener("change", function() {
-                    let tr = checkboxes[i].closest("tr")
-                    tr.classList.toggle("selection")
-                    let total = 0
-                    for (let j = 0; j < checkboxes.length; j++) {
-                        if (checkboxes[j].checked == true) {total += 1}
-                    }
+                    checkboxes[i].closest("tr").classList.toggle("selection")
+
+                    if (checkboxes[i].checked) {total += 1}
+                    else {total -= 1}
+
                     if (total > 0) {
-                        document.querySelector(".topbar").classList.remove("hidden")
-                        document.querySelector(".topbar > span").innerHTML = `${total} items selected`
+                        document.querySelector(".topbar > .onselection").classList.remove("hidden")
+                        document.querySelector(".onselection .rect").innerHTML = `${total} items selected`
+                        if (total == checkboxes.length) {
+                            document.getElementById("all-checkboxes").checked = true
+                        } else {
+                            document.getElementById("all-checkboxes").checked = false
+                        }
+                    } else {
+                        document.querySelector(".topbar > .onselection").classList.add("hidden")
                     }
-                    else {document.querySelector(".topbar").classList.add("hidden")}
                 })
             }
 
@@ -116,15 +142,58 @@
             // Mobile
             document.querySelector(".search_bar > .bubble-menu").addEventListener("click", function() {
                 let bar = document.querySelector(".sidebar")
-                bar.classList.remove("hidden")
-                window.onclick = (pointer) => {
-                    if (pointer.clientX > bar.getBoundingClientRect().right) {
-                        console.log("You clicked right to the sidebar")
-                        bar.classList.add("hidden")
-                        window.onclick = null
+                bar.classList.add("sidebar-toggle")
+                window.setTimeout(function() {
+                    window.onclick = (pointer) => {
+                        if (pointer.clientX > bar.getBoundingClientRect().right) {
+                            console.log("You clicked right to the sidebar")
+                            bar.classList.remove("sidebar-toggle")
+                            window.onclick = null
+                        }
                     }
+                }, 100)
+                
+            });
+            
+
+            (function() {
+                let json_mails = `{{json_mails|safe}}`
+                let mails = JSON.parse(json_mails)
+                let dateElems = document.querySelectorAll(".menu > .date")
+                const currentDate = new Date()
+
+                for (let i = 0; i < mails.length; i++) {
+                    let date = new Date(`${mails[i].date}T${mails[i].time}Z`)
+
+                    let delta = (currentDate - date) / (1000 * 60) // stores minutes in delta
+                    if (delta < 1) {
+                        dateElems[i].innerHTML = `Just now`
+                    }
+                    else if (delta < 60) {
+                        dateElems[i].innerHTML = `${Math.floor(delta)}mins`
+                    }
+                    else if (delta < 1400) {
+                        dateElems[i].innerHTML = `${Math.floor(delta / 60)}hours`
+                    } else {dateElems[i].innerHTML = date.toLocaleDateString("en-GB", {day: "numeric", month: "short"})}
                 }
-            })
+            })()
+
+            if (window.innerWidth < 768) {
+                console.log('ready')
+                for (let tr of document.querySelectorAll("tr")) {
+                    tr.addEventListener("mousedown", function() {
+                        console.log("detected hold")
+                        timer = setTimeout(function() {
+                            console.log("The animation should play")
+                        }, 1000)
+                        console.log(`timer set as ${timer}`)
+                    })
+                }
+                window.addEventListener("mouseup", function() {
+                    console.log("detected up")
+                    if (timer) clearTimeout(timer)
+                })
+            }
         })
     </script>
     {% endblock %}

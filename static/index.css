@@ -25,8 +25,7 @@ table {
     color: rgb(0, 0, 0)
 }
 
-.sixth,
-.sixth > div {                
+.overflow {                
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -67,7 +66,6 @@ body {
     width: 40px; 
 }
 .bubble-sender {
-    background-color: rgb(11, 68, 90);
     height: 80%;
     flex: 0 0 auto;
 }  
@@ -80,6 +78,15 @@ body {
     transform: translate(-50%, -50%);
 }
 
+.f-b {
+    display: flex;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+}
+.f-g {
+    gap: 10px
+}
 
 td:has(.bubble-sender) {
     justify-content: flex-start;
@@ -116,9 +123,8 @@ td {
     display: flex;
     flex-flow: column nowrap;
     justify-content: space-between;
-    font-size: small;
     white-space: nowrap;
-    align-items: center;
+    align-items: flex-end;
 }
 .sixth > div {
     width: 100%;
@@ -147,26 +153,34 @@ td {
     position: absolute;
     top: 0;
     bottom: 0;
-    width: 70%;
+    width: 0;
     max-width: 240px;
     border-radius: 0 20px 20px 0;
     background-color: rgb(42, 49, 80);
     box-shadow: 0 0 2px black inset;
+    transition: width 0.3s ease;
+}
+.sidebar-toggle {
+    width: 70%
 }
 .topbar {
-    width: 100%;
     height: 40px;
     display: flex;
     align-items: center;
-    background-color: aliceblue;
 }
-.topbar > div {
+.topbar > .space {
     flex: 1 1 auto;
-    display: flex;
-    justify-content: center;
 }
-.topbar i {
-    margin: 0 4px;
+.last > .main {
+    height: 70% !important
+}
+.rect {
+    padding: 5px;
+    border-radius: 4px;
+}
+.rect:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+    transition-duration: 0.1s;
 }
 .search_bar {
     background-image: linear-gradient(to right, rgb(60, 60, 60), rgb(33, 33, 59));
@@ -184,8 +198,8 @@ td {
         font-size: small;
         margin-top: -2px;
     }
-    .topbar {
-        margin: 0 15px;
+    .menu {
+        font-size: small;
     }
 } 
 
@@ -201,12 +215,21 @@ td {
         border-radius: 20px;
         margin: 5px 0;
     }
+    .icon {
+        cursor: pointer;
+    }
     .basic {
         display: flex;
         flex: 1 1 0px;
         align-items: center;
         height: 100%;
     }    
+    .mr {
+        margin-right: 10px;
+    }
+    .ml {
+        margin-left: 10px;
+    }
     .basic > h4 {
         margin: 0;
     }
@@ -220,20 +243,18 @@ td {
         grid-template-columns: auto auto;
         grid-template-rows: auto 1fr;
     }
-    @keyframes slideAnimation {
-        0% { width: 0; }
-        100% { width: 20vw }
-    }
+    
     .animate {
-        animation: slideAnimation 0.3s ease forwards;
+        width: 20vw !important
     }
     .right {
         overflow: hidden;
     }
     .left {
-        transition: all 10s ease;
+        transition: all 0.3s ease;
         display: block;
         background-color: rgba(0, 0, 0, 0.1);
+        border-radius: 0 15px 15px 0;
         width: 0
     }
     .box {
@@ -256,7 +277,6 @@ td {
         display: flex;
         align-items: center;
         justify-content: center;
-        flex: 1 1 auto;
     }
     tr {
         display: flex;
@@ -270,17 +290,22 @@ td {
         justify-content: center;
         align-items: center;
     }
-    .menu > div {
+    .menu > .date {
+        width: 70px;
+        text-align: right;
         color: black;
-        font-size: initial;
     }
     .top {
-        height: 100%
+        grid-column: 1 / 3;
     }
     .sixth {
         flex: 50 1 450px;
         justify-content: flex-start;
         align-content: center;
+    }
+    .second {
+        width: 60px;
+        justify-content: flex-start;
     }
     
     .bubble {
