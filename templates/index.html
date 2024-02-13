@@ -185,8 +185,16 @@
                         console.log("detected hold")
                         timer = setTimeout(function() {
                             console.log("The animation should play")
-                        }, 1000)
+                            tr.querySelector(".bubble-sender").classList.add("rotate")
+                            setTimeout(function() {
+                                tr.querySelector(".bubble-sender > .center").innerHTML = ""
+                            }, 150)
+                        }, 500)
                         console.log(`timer set as ${timer}`)
+                    })
+
+                    tr.addEventListener("animationend", function() {
+                        tr.querySelector(".bubble-sender").classList.remove("rotate")
                     })
                 }
                 window.addEventListener("mouseup", function() {

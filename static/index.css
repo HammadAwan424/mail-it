@@ -189,6 +189,9 @@ td {
 .search_bar:has(input:focus) {
     background-image: linear-gradient(to right, rgb(61, 61, 61), rgb(44, 44, 82));
 }
+.rotate {
+    animation: rotate 0.4s ease-in-out;
+}
 
 @media screen and (max-width: 768px) {
     .no-mobile {
@@ -200,6 +203,10 @@ td {
     }
     .menu {
         font-size: small;
+    }
+    @keyframes rotate {
+        0% {transform: rotateY(0deg)}
+        100% {transform: rotateY(180deg)}
     }
 } 
 
