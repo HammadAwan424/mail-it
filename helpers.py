@@ -1,14 +1,19 @@
 from flask import session, redirect
 from sqlalchemy import Table, Column, MetaData, Integer, String, Boolean, ForeignKey, create_engine, insert, select, update, exists
-from sqlalchemy import or_, and_
 from sqlalchemy.dialects.sqlite import TIME, DATE
 from datetime import datetime, timezone
+import json
+from functools import wraps
 import logging
+from typing import List, Dict
 
-def login(f):
+def logged_in(f):
+    @wraps(f)
     def inner(*args,  **kwargs):
-        if session.get("id") is None:
+        if session.get("user") is None:
             return redirect("/login")
+        if not session["user"].get("color"):
+            return redirect("/user-profile")
         else:
             return f(*args,  **kwargs)
     return inner
@@ -38,55 +43,45 @@ mails = Table(
     Column("read", Boolean, default=False)
 )
 
-def engine_checker(obj):
-    if obj.engine == None:
-        raise ValueError("Missing Engine")
-    else:
-        return obj.engine
+
 
 class Email:
-
-    engine = None
-
-    @classmethod
-    def set_engine(cls, engine):
-        cls.engine = engine
+    _engine = None
 
     @classmethod
-    def all(cls, user_receiver=None, user_sender=None):
+    def all_for(cls, receiver_id=None, sender_id=None) -> List[Dict]:
         # Pass any one of the above kwargs
-        # if receiver is given, then below is executed
-
-        engine_checker(cls)
-        column = "receiver"
-        col_secondary = "sender"
-        query = user_receiver
-
-        if user_sender: # if sender is given
-            column = 'sender'
-            col_secondary = "receiver"
-            query = user_sender
+        
+        # Query to return all mails with the same sender or receiver
+        query = select(mails, users).where(mails.c.receiver==receiver_id).join(users, mails.c.sender==users.c.id) #default for same receiver
+        if sender_id:
+            query = select(mails, users).where(mails.c.sender==sender_id).join(users, mails.c.receiver==users.c.id)
+        stmt = query.order_by(mails.c.date.desc(), mails.c.time.desc()).limit(50)
 
         emails = []
         with cls.engine.connect() as conn:
-
-            stmt = select(mails, users).where(mails.c[column]==query).join(users, mails.c[col_secondary]==users.c.id)
-            order_limit = stmt.order_by(mails.c.date.desc(), mails.c.time.desc()).limit(50)
-            result = conn.execute(order_limit)
-
-            if user_receiver: # if receiver was given
-                for row in result:               
-                    emails.append(Email(row.text, (row.sender, row.username, row.color), row.receiver, id=row.id, date=row.date, time=row.time, read=row.read))
-                return emails
-            for row in result: # if sender was given
-                emails.append(Email(row.text, row.sender, (row.receiver, row.username, row.color), id=row.id, date=row.date, time=row.time, read=row.read))
+            result = conn.execute(stmt)
+            for row in result: 
+                mail = {
+                    "mail_id": row.id,
+                    "message": row.text,
+                    "receiver": row.receiver,
+                    "sender": row.sender,
+                    "date": row.date,
+                    "time": row.time,
+                    "date": row.date,
+                    "read": row.read
+                }       
+                if receiver_id:
+                    mail["sender"] = (row.sender, row.username, row.color)
+                elif sender_id:
+                    mail["receiver"] = (row.receiver, row.username, row.color)
+                emails.append(mail)
             return emails
         
 
-    
     @classmethod
-    def read_state(self, mail_id, user_id):
-        engine_checker(self)
+    def is_read(self, mail_id, user_id):
         stmt = update(mails).values(read=True).where(mails.c.id == mail_id, mails.c.receiver == user_id)
         with self.engine.begin() as conn:
             conn.execute(stmt)
@@ -106,7 +101,6 @@ class Email:
             setattr(self, key, data[key])
 
     def set(self):
-        engine_checker(self)
         with self.engine.begin() as conn:
             stmt = insert(mails).values(text=self.message, sender=self.sender, receiver=self.receiver, date=self.date, time=self.time)            
             conn.execute(stmt)
@@ -115,10 +109,22 @@ class Email:
             receiver = conn.execute(select(users.c.username).where(users.c.id == self.receiver)).scalar()
             logging.info(f"Email sent from {sender.title()} to {receiver.title()}")
         
-    
+    @property
+    def engine(cls):
+        print("class property is used")
+        if cls._engine == None:
+            raise ValueError("Missing Engine")
+        else:
+            return cls._engine     
 
-def date(date):
-    return date.strftime("%d %b")
+    @engine.setter
+    def engine(cls, eng):
+        cls._engine = eng
+
+
+def myjson(python_mails):
+    json_mails = json.dumps(python_mails, default=str, indent=2)
+    return json_mails
 
 if __name__ == "__main__":
     print("Metadata was called")

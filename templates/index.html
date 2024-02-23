@@ -3,21 +3,25 @@
 <html lang="en">
     <head>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
         <link href="https://css.gg/css" rel="stylesheet">
-        <link href="../static/index.css" rel="stylesheet">
+        <link href="/static/index.css" rel="stylesheet">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{% block title %}Homepage{% endblock %}</title>
-        {% block style %}
+        {%- block style %}
         <style>
             .bubble-user {
-                background-color: {{user.color}};
+                background-color: {{session["user"]["color"]}};
             }
         </style>
-        {% endblock %}
+        {%- endblock %}
+
+        <!--Return classes based on read state-->
+        {%- macro read(state) %}
+            {{'dark' if state else 'light fw-bold'}}
+        {%- endmacro %}
     </head>
     <body>      
-        {% block body %}      
+        {%- block body %}      
         <div class="grid">
             <div class="top">
                 <div class="basic no-mobile light">
@@ -28,15 +32,18 @@
                     <div class="bubble-menu no-desktop"><i class="gg-menu light center"></i></div>
                     <i class="gg-search no-mobile"></i>
                     <input class="light" placeholder="Search in emails">
-                    <div class="bubble-user no-desktop"><p class="center light">{{ session.get("username").title()[0] }}</p></div>
+                    <div class="bubble-user no-desktop"><p class="center light">{{ session.user.username.title()[0] }}</p></div>
                 </form>
-                <div class="user no-mobile"><div class="bubble-user"><p class="center fw-bold">{{ session.get("username").title()[0] }}</p></div></div>
+                <div class="user no-mobile"><div class="bubble-user"><p class="center fw-bold">{{ session.user.username.title()[0] }}</p></div></div>
                 <p class="dark small p no-desktop">Primary</p>  
             </div> 
+
             <div class="left">
                 1
             </div>
+
             <div class="right">
+                {% if mails %}
                 <div class="topbar light no-mobile">
                     <div class="main"><input type="checkbox" class="form-check-input icon" id="all-checkboxes"></div>
 
@@ -44,7 +51,7 @@
                         <div class="rect mr"><span>5 items Selected</span></div>
                         <div class="main mr icon"><i class="gg-trash black"></i></div>
                         <div class="main mr icon"><i class="gg-check-r black"></i></div>
-                        <div class="main mr icon"><i class="gg-more-vertical-alt black"></i></div>
+                        <div class="main mr icon"><i class="gg-more-vertical-alt black" ></i></div>
                     </div>
                     <div class="space"></div>
                     <div class="last f-b small">
@@ -52,28 +59,38 @@
                         <div class="main icon">&lt;</div>
                         <div class="main icon">&gt;</div>
                     </div>
+                {% endif %}
                     
                 </div>
                 <table>
                     {%- for mail in mails %}
                         <tr class="hover">
-                            <td class="no-desktop"><div class="bubble-sender" style="background-color: {{mail.sender[2]}};"><div class="center light">{{ mail.sender[1].title()[0] }}</div></div></td>
+                            <!--Sender Bubble-->
+                            <td class="no-desktop light">
+                                <div class="bubble-sender" style="background-color: {{mail.sender[2]}};">
+                                    <div class="front"><span class="center">{{ mail.sender[1].title()[0] }}</span></div>
+                                    <div class="back"><i class="gg-check center"></i></div>
+                                </div>
+                            </td>
 
+                            <!--Icons for Desktops-->
                             <td class="no-mobile first"><div class="main"><input type="checkbox" class="form-check-input icon" id="checkbox{{loop.index}}"></div></td>
-                            <td class="no-mobile second fw-bold"><label class="black overflow" for="checkbox{{loop.index}}">{{ mail.sender[1].title() }}</label></td>
+                            <td class="no-mobile second"><label class="overflow {{read(mail.read)}}" for="checkbox{{loop.index}}">{{ mail.sender[1].title() }}</label></td>
                             <td class="no-mobile third icon side"><div class="main"><i class="gg-trash black"></i></div></td>
                             <td class="no-mobile fourth icon"><div class="main"><i class="gg-check-r black"></i></div></td>
                             <td class="no-mobile fifth icon"><div class="main"><i class="gg-more-vertical-alt black"></i></td>
-
-                            <td class="sixth overflow">
-                                <div class="no-desktop sender fw-bold light overflow">{{ mail.sender[1].title() }}</div>
-                                <div class="no-desktop title fw-bold light overflow">Did you see thes 100$?</div>
+                            
+                            <!--Main Message-->
+                            <td class="sixth overflow" data-mail-id="{{mail.mail_id}}">
+                                <div class="no-desktop sender overflow {{read(mail.read)}}">{{ mail.sender[1].title() }}</div>
+                                <div class="no-desktop title overflow {{read(mail.read)}}">Did you see thes 100$?</div>
                                 <div class="no-desktop message small fw-normal dark overflow">{{ mail.message }}</div>
-                                <div id="child" class="no-mobile black message overflow">{{ mail.message }}</div>
+                                <div id="child" class="no-mobile dark message overflow {{read(mail.read)}}">{{ mail.message }}</div>
                             </td>
 
+                            <!--Dates-->
                             <td class="menu">
-                                <div class="date small light fw-bold mr"></div>
+                                <div class="date small mr {{read(mail.read)}}"></div>
                                 <i class="no-desktop gg-more-vertical-o dark"></i>
                             </td>
                         </tr>
@@ -86,17 +103,33 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            checkboxes = document.querySelectorAll("td .form-check-input")
-            document.getElementById("all-checkboxes").addEventListener("change", function() {
-                if (this.checked) {
-                    checkboxes.forEach(function(box) {
-                        if (!box.checked) {box.click()}
-                    })
-                }
-                else {checkboxes.forEach(function(box) {
-                    box.click()
-                })}
+            let search = document.querySelector(".search_bar > input")
+            // search.addEventListener("input", async function() {
+            //     let response = await fetch(`/send?q=${search.value}`)
+            //     console.log(response.text())
+            // })
+
+            document.querySelectorAll("tr > .sixth").forEach(function(tr) {
+                tr.addEventListener("click", async function() {
+                    let id = this.dataset.mailId
+                    let response = fetch(`/read?mail_id=${id}`)
+                })
             })
+
+            
+            checkboxes = document.querySelectorAll("td .form-check-input")
+            if (checkboxes.length > 0) {
+                document.getElementById("all-checkboxes").addEventListener("change", function() {
+                    if (this.checked) {
+                        checkboxes.forEach(function(box) {
+                            if (!box.checked) {box.click()}
+                        })
+                    }
+                    else {checkboxes.forEach(function(box) {
+                        box.click()
+                    })}
+                })
+            }
 
             let total = 0
             for (let i = 0; i < checkboxes.length; i++) {
@@ -118,21 +151,20 @@
                         document.querySelector(".topbar > .onselection").classList.add("hidden")
                     }
                 })
-            }
+            };
 
 
-            function deleter() {
+            (function deleter() {
                 let trash_icons = document.getElementsByClassName("third")
 
                 for (let icon of trash_icons) {
                     icon.addEventListener("click", function() {
                         let tr = this.closest("tr")
-                        tr.children[2].classList.remove("side")
+                        tr.querySelector(".side").classList.remove("side")
                         tr.classList.add("delete")
                     }) 
                 }
-            }
-            deleter()
+            })()
 
             /* PC */
             document.querySelector(".basic > .bubble").addEventListener("click", function() {
@@ -157,7 +189,7 @@
             
 
             (function() {
-                let json_mails = `{{json_mails|safe}}`
+                let json_mails = `{{mails | myjson | safe}}`
                 let mails = JSON.parse(json_mails)
                 let dateElems = document.querySelectorAll(".menu > .date")
                 const currentDate = new Date()
@@ -179,27 +211,27 @@
             })()
 
             if (window.innerWidth < 768) {
+                let timeout;
                 console.log('ready')
+
                 for (let tr of document.querySelectorAll("tr")) {
                     tr.addEventListener("mousedown", function() {
-                        console.log("detected hold")
-                        timer = setTimeout(function() {
+                        console.log("detected hold,")
+                        timeout = setTimeout(function() {
                             console.log("The animation should play")
-                            tr.querySelector(".bubble-sender").classList.add("rotate")
-                            setTimeout(function() {
-                                tr.querySelector(".bubble-sender > .center").innerHTML = ""
-                            }, 150)
+                            tr.querySelector(".bubble-sender").classList.add("bubble-animate")
+                            tr.querySelector(".bubble-sender").addEventListener("click", function() {
+                                this.classList.remove("bubble-animate")
+                        })
                         }, 500)
-                        console.log(`timer set as ${timer}`)
-                    })
-
-                    tr.addEventListener("animationend", function() {
-                        tr.querySelector(".bubble-sender").classList.remove("rotate")
+                        console.log(`timer set as ${timeout}`)
                     })
                 }
+
                 window.addEventListener("mouseup", function() {
                     console.log("detected up")
-                    if (timer) clearTimeout(timer)
+                    clearTimeout(timeout)
+                    console.log("timer cleard")
                 })
             }
         })

@@ -56,9 +56,9 @@
 {% endblock %}
 
 {% block body %}
-    <h1 class="light">Hi {{session.get("username").title()}}! just a small Set-up...</h1>
+    <h1 class="light">Hi {{session.get("user").get("username").title()}}! just a small Set-up...</h1>
     <div class="flex">
-        <div class="circle light"><div class="char">{{session.get("username").title()[0]}}</div></div>
+        <div class="circle light"><div class="char">{{session.get("user").get("username").title()[0]}}</div></div>
         <div class="small">
             <input class="form-range" type="range" min="0" max="256">
             <input class="form-range" type="range" min="0" max="256">
