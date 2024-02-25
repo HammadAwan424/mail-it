@@ -39,8 +39,11 @@
                 <p class="dark small p no-desktop">Primary</p>  
             </div> 
 
-            <div class="left">
-                1
+            <!--Left(2) child of grid-->
+            <div class="sidebar-desk">
+                <div class="sd-container">
+                    <button class="uni-btn c-btn light">Compose</button>
+                </div>
             </div>
 
             <div class="right">
@@ -97,13 +100,36 @@
                         </tr>
                     {%- endfor %}
                 </table>  
-                <div class="sidebar no-desktop"></div>
+                <div class="sidebar-mob no-desktop"></div>
+                <div class="compose-area no-mobile">
+                    <div class="ca-menu fw-bold black">
+                        <span class="m0">New Message</span>
+                        <div class="c-cross small">X</div>
+                    </div>
+                    <span class="black">To</span>
+                    <input placeholder="Recepient" class="light" name="receiver" type="text">
+                    <input placeholder="Subject" class="light" type="text" name="subject">
+                    <textarea placeholder="Message" class="small light" name="message"></textarea>
+                    <button class="send light">Send</button>
+                </div>
             </div>            
         </div>
     </body>
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
+            function renderComposePage() {
+                let compose = document.createElement("div")
+                compose.innerHTML = "hello"
+                document.body.appendChild(compose)
+            }
+
+            //Compose page loader
+            let deskSidebar = document.querySelectorAll(".sd-container > *")
+            deskSidebar[0].addEventListener("click", renderComposePage)
+
+
+
             let input = document.querySelector(".search_bar > input")
             input.addEventListener("input", async function() {
                 // let bottom = this.parentNode.querySelector(".search-result")
@@ -171,12 +197,12 @@
 
             /* PC */
             document.querySelector(".basic > .bubble").addEventListener("click", function() {
-                document.querySelector(".left").classList.toggle("animate") 
+                document.querySelector(".sidebar-desk").classList.toggle("animate") 
             })
 
             // Mobile
             document.querySelector(".search_bar > .bubble-menu").addEventListener("click", function() {
-                let bar = document.querySelector(".sidebar")
+                let bar = document.querySelector(".sidebar-mob")
                 bar.classList.add("sidebar-toggle")
                 window.setTimeout(function() {
                     window.onclick = (pointer) => {

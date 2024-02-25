@@ -42,15 +42,12 @@
     input {
         width: 30% !important; 
     }
-    button {
-        width: 150px;
-        height: 40px;
-        border: 2px solid;
-        border-radius: 30px;
-        background-color: rgb(33, 33, 59);
-    }
     form {
         margin: 0 auto;
+    }
+    .uni-btn {       
+        width: 150px;
+        height: 40px;
     }
 </style>
 {% endblock %}
@@ -66,7 +63,7 @@
         </div>
         <form action="/user-profile" method="post">
             <input type="hidden" id="value" name="color">
-            <button type="submit" class="light">Let's goo</button>
+            <button type="submit" class="light uni-btn">Let's goo</button>
         </form>
     </div>
 
