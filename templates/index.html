@@ -33,6 +33,7 @@
                     <i class="gg-search no-mobile"></i>
                     <input class="light" placeholder="Search in emails">
                     <div class="bubble-user no-desktop"><p class="center light">{{ session.user.username.title()[0] }}</p></div>
+                    <div class="search-result"></div>
                 </form>
                 <div class="user no-mobile"><div class="bubble-user"><p class="center fw-bold">{{ session.user.username.title()[0] }}</p></div></div>
                 <p class="dark small p no-desktop">Primary</p>  
@@ -103,11 +104,13 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            let search = document.querySelector(".search_bar > input")
-            // search.addEventListener("input", async function() {
+            let input = document.querySelector(".search_bar > input")
+            input.addEventListener("input", async function() {
+                // let bottom = this.parentNode.querySelector(".search-result")
+                // bottom.classList.remove("hidden")
             //     let response = await fetch(`/send?q=${search.value}`)
             //     console.log(response.text())
-            // })
+            })
 
             document.querySelectorAll("tr > .sixth").forEach(function(tr) {
                 tr.addEventListener("click", async function() {
