@@ -121,5 +121,12 @@ def read():
 @app.route("/send")
 @logged_in
 def send():
-    mails = Email.all_for(receiver_id=session.get("user").get("id"))
-    return myjson({"mails": mails})
+    data = {
+        "sender": session["user"]["id"],
+        "receiver": request.args.get("receiver"),
+        "subject": request.args.get("subject"),
+        "message": request.args.get("message")
+    }
+    sent_mail = Email(data["message"], data["sender"], data["receiver"])
+    sent_mail.set()
+    return "sucess"

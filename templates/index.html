@@ -101,7 +101,23 @@
                     {%- endfor %}
                 </table>  
                 <div class="sidebar-mob no-desktop"></div>
-                <div class="compose-area no-mobile">
+            </div>            
+        </div>
+    </body>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            function innerHTML(selector) {
+                return document.querySelector(selector).value
+            }
+
+            function renderComposePage() {
+                if (document.querySelector(".compose-area")) {
+                    return
+                }
+                let compose = document.createElement("div")
+                compose.classList.add("no-mobile", "compose-area")
+                let html = `
                     <div class="ca-menu fw-bold black">
                         <span class="m0">New Message</span>
                         <div class="c-cross small">X</div>
@@ -111,17 +127,24 @@
                     <input placeholder="Subject" class="light" type="text" name="subject">
                     <textarea placeholder="Message" class="small light" name="message"></textarea>
                     <button class="send light">Send</button>
-                </div>
-            </div>            
-        </div>
-    </body>
+                `
+                compose.innerHTML = html
+                document.querySelector(".grid").appendChild(compose)
+                
+                compose.querySelector(".c-cross").addEventListener("click", function() {
+                    document.querySelector('.compose-area').remove()
+                })
+                compose.querySelector(".send").addEventListener("click", async function() {
+                    let data = [
+                        innerHTML("input[placeholder='Recepient']"),
+                        innerHTML("input[placeholder='Subject']"),
+                        innerHTML("textarea[placeholder='Message']")
+                        ]
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            function renderComposePage() {
-                let compose = document.createElement("div")
-                compose.innerHTML = "hello"
-                document.body.appendChild(compose)
+                    let url = `/send?receiver=${data[0]}&subject=${data[1]}&message=${data[2]}`
+                    await fetch(url)
+                    console.log(data)
+                })
             }
 
             //Compose page loader
