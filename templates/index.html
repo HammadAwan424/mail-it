@@ -107,6 +107,66 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
+            class checkbox {
+                constructor() {}
+                setChild(cssSelector) {
+                    this.childCheckboxes = document.querySelectorAll(cssSelector)
+                }
+                setParent(cssSelector) {
+                    this.parentCheckbox = document.querySelector(cssSelector)
+                }
+                activeParent() { // array of children checkboxes
+                    let array = this.childCheckboxes
+                    if (array.length < 0) {
+                        return
+                    }
+                    this.parentCheckbox.addEventListener("change", function() {
+                        if (this.checked) {
+                            array.forEach(function(box) {
+                                if (!box.checked) {box.click()}
+                            })
+                        }
+                        else {array.forEach(function(box) {
+                            box.click()
+                        })}
+                    })
+                }
+                activeChild() {
+                    let array = this.childCheckboxes
+                    let obj = this
+                    let num = 0
+                    for (let i = 0; i < array.length; i++) {
+                        array[i].addEventListener("change", function() {
+                            array[i].closest("tr").classList.toggle("selection")
+                            if (array[i].checked) {num += 1}
+                            else {num -= 1}
+                            obj.counter(num, obj)
+                        })
+                    };
+                }
+                counter(num, obj) { // checked checkboxes num and max number of checkboxex
+                    let max = obj.childCheckboxes.length
+                    if (num == 0) {
+                        document.querySelector(".topbar > .onselection").classList.add("hidden")
+                    }
+                    if (num > 0) {
+                        document.querySelector(".topbar > .onselection").classList.remove("hidden")
+                        document.querySelector(".onselection .rect").innerHTML = `${num} items selected`
+                        if (num == max) {
+                            obj.parentCheckbox.checked = true
+                        } else {
+                            obj.parentCheckbox.checked = false
+                        }
+                    }   
+                }
+            }
+
+            const checkboxManager = new checkbox()
+            checkboxManager.setChild("td .form-check-input")
+            checkboxManager.setParent("#all-checkboxes")
+            checkboxManager.activeChild()
+            checkboxManager.activeParent()
+
             function innerHTML(selector) {
                 return document.querySelector(selector).value
             }
@@ -166,44 +226,7 @@
                     let id = this.dataset.mailId
                     let response = fetch(`/read?mail_id=${id}`)
                 })
-            })
-
-            
-            checkboxes = document.querySelectorAll("td .form-check-input")
-            if (checkboxes.length > 0) {
-                document.getElementById("all-checkboxes").addEventListener("change", function() {
-                    if (this.checked) {
-                        checkboxes.forEach(function(box) {
-                            if (!box.checked) {box.click()}
-                        })
-                    }
-                    else {checkboxes.forEach(function(box) {
-                        box.click()
-                    })}
-                })
-            }
-
-            let total = 0
-            for (let i = 0; i < checkboxes.length; i++) {
-                checkboxes[i].addEventListener("change", function() {
-                    checkboxes[i].closest("tr").classList.toggle("selection")
-
-                    if (checkboxes[i].checked) {total += 1}
-                    else {total -= 1}
-
-                    if (total > 0) {
-                        document.querySelector(".topbar > .onselection").classList.remove("hidden")
-                        document.querySelector(".onselection .rect").innerHTML = `${total} items selected`
-                        if (total == checkboxes.length) {
-                            document.getElementById("all-checkboxes").checked = true
-                        } else {
-                            document.getElementById("all-checkboxes").checked = false
-                        }
-                    } else {
-                        document.querySelector(".topbar > .onselection").classList.add("hidden")
-                    }
-                })
-            };
+            });
 
 
             (function deleter() {
