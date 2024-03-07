@@ -1,5 +1,5 @@
 from flask import session, redirect
-from sqlalchemy import Table, Column, MetaData, Integer, String, Boolean, ForeignKey, create_engine, insert, select, update, exists
+from sqlalchemy import Table, Column, MetaData, Integer, String, Boolean, ForeignKey, create_engine, insert, select, update, exists, func
 from sqlalchemy.dialects.sqlite import TIME, DATE
 from datetime import datetime, timezone
 import json
@@ -48,36 +48,44 @@ mails = Table(
 class Email:
     _engine = None
 
+    # Pass any one of the below kwargs
     @classmethod
-    def all_for(cls, receiver_id=None, sender_id=None) -> List[Dict]:
-        # Pass any one of the above kwargs
+    def all_for(cls, receiver_id=None, sender_id=None, offset=1) -> Dict:
+        # Give specified page based on the value of offset, lmt mails per page
+        lmt = 4
+        page = (offset-1)*lmt
+
         
-        # Query to return all mails with the same sender or receiver
-        query = select(mails, users).where(mails.c.receiver==receiver_id).join(users, mails.c.sender==users.c.id) #default for same receiver
+        # Query to return all mails with the same receiver else sender
+        if receiver_id:
+            query = select(mails, users).where(mails.c.receiver==receiver_id).join(users, mails.c.sender==users.c.id) 
         if sender_id:
             query = select(mails, users).where(mails.c.sender==sender_id).join(users, mails.c.receiver==users.c.id)
-        stmt = query.order_by(mails.c.date.desc(), mails.c.time.desc()).limit(50)
+        stmt = query.order_by(mails.c.date.desc(), mails.c.time.desc()).offset(page).limit(lmt)
+        
 
-        emails = []
+        mail_dicts = []
         with cls.engine.connect() as conn:
-            result = conn.execute(stmt)
-            for row in result: 
-                mail = {
-                    "mail_id": row.id,
-                    "message": row.text,
-                    "receiver": row.receiver,
-                    "sender": row.sender,
-                    "date": row.date,
-                    "time": row.time,
-                    "date": row.date,
-                    "read": row.read
+            column = (mails.c.receiver, receiver_id) if receiver_id else (mails.c.sender, sender_id)
+            mail_count = conn.execute(select(func.count(mails.c.id)).where(column[0] == column[1])).scalar()
+
+            for mail in conn.execute(stmt): 
+                single_mail = {
+                    "mail_id": mail.id,
+                    "message": mail.text,
+                    "receiver": mail.receiver,
+                    "sender": mail.sender,
+                    "date": mail.date,
+                    "time": mail.time,
+                    "date": mail.date,
+                    "read": mail.read
                 }       
                 if receiver_id:
-                    mail["sender"] = (row.sender, row.username, row.color)
+                    single_mail["sender"] = (mail.sender, mail.username, mail.color)
                 elif sender_id:
-                    mail["receiver"] = (row.receiver, row.username, row.color)
-                emails.append(mail)
-            return emails
+                    single_mail["receiver"] = (mail.receiver, mail.username, mail.color)
+                mail_dicts.append(single_mail)
+            return {"total": mail_count, "mails": mail_dicts, "count": len(mail_dicts), "per_page": lmt}
         
 
     @classmethod

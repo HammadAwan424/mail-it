@@ -1,4 +1,4 @@
-from flask import Flask, render_template, session, redirect, request
+from flask import Flask, render_template, session, redirect, request, abort
 from flask_session import Session
 from helpers import users, mails, Email, myjson, logged_in
 import logging
@@ -130,3 +130,19 @@ def send():
     sent_mail = Email(data["message"], data["sender"], data["receiver"])
     sent_mail.set()
     return "sucess"
+
+@app.route("/page/<int:page>")
+@logged_in
+def page(page):
+    mails = Email.all_for(receiver_id=session["user"]["id"], offset=page)
+    return myjson(mails)
+
+@app.route("/api/page/<int:page>")
+@logged_in
+def api(page):
+    mails = Email.all_for(receiver_id=session["user"]["id"], offset=page)
+    if not len(mails['mails']):
+        return abort(404)
+    template =  render_template("mails.html", mails=mails)
+    response = myjson({"mails": mails, "template": template})
+    return response

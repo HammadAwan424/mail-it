@@ -58,16 +58,16 @@
                         <div class="main mr icon"><i class="gg-more-vertical-alt black" ></i></div>
                     </div>
                     <div class="space"></div>
-                    <div class="last f-b small">
-                        <div class="rect small">1-50 of 104</div>
-                        <div class="main icon">&lt;</div>
-                        <div class="main icon">&gt;</div>
+                    <div class="page f-b small">
+                        <div class="rect small">1-{{mails['count']}} of {{mails['total']}}</div>
+                        <div id="previous" data-page="0" class="main icon">&lt;</div>
+                        <div id="next" data-page="2" class="main icon">&gt;</div>
                     </div>
                 {% endif %}
                     
                 </div>
                 <table>
-                    {%- for mail in mails %}
+                    {%- for mail in mails['mails'] %}
                         <tr class="hover">
                             <!--Sender Bubble-->
                             <td class="no-desktop light">
@@ -89,7 +89,7 @@
                                 <div class="no-desktop sender overflow {{read(mail.read)}}">{{ mail.sender[1].title() }}</div>
                                 <div class="no-desktop title overflow {{read(mail.read)}}">Did you see thes 100$?</div>
                                 <div class="no-desktop message small fw-normal dark overflow">{{ mail.message }}</div>
-                                <div id="child" class="no-mobile dark message overflow {{read(mail.read)}}">{{ mail.message }}</div>
+                                <div id="child" class="no-mobile message overflow {{read(mail.read)}}">{{ mail.message }}</div>
                             </td>
 
                             <!--Dates-->
@@ -107,6 +107,57 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
+            async function request_page(activeNav, sideSelector, requestedPage) {
+                let secondaryNav = null
+                let clickedNav = activeNav.dataset
+
+                if (clickedNav.page == 0) {
+                    alert("You are already at first page")
+                    return 
+                }
+
+                let response = await fetch(`/api/page/${clickedNav.page}`)
+                if (response.status != 200) {
+                    alert("No more pages")
+                    return 
+                }
+
+                if (requestedPage > 0) {
+                    secondaryNav = document.querySelector(sideSelector).dataset
+                }
+                else {
+                    secondaryNav = document.querySelector(sideSelector).dataset
+                }
+                
+                children = document.querySelectorAll("tr")
+                children.forEach(function(child) {child.remove()})
+
+                //json containing mails data and template data
+                json = await response.json()
+                document.querySelector("tbody").innerHTML = json["template"]
+                
+                from = (Number(clickedNav.page) - 1) * json.mails.per_page + 1
+                to = Number(clickedNav.page) * json.mails.per_page
+                document.querySelector(".page > .rect").innerHTML = `${from}-${to} of ${json.mails.total}`
+                clickedNav.page = Number(clickedNav.page) + requestedPage
+                secondaryNav.page = Number(secondaryNav.page) + requestedPage
+                
+                checkboxManager.setChild("td .form-check-input")
+                checkboxManager.setParent("#all-checkboxes")
+                checkboxManager.activeChild()
+                checkboxManager.activeParent()
+
+                dateManager(json['mails']['mails'])
+                console.log(json)
+            }
+
+            document.querySelector(".page").addEventListener('click', function(event) {
+                if (event.target == this.querySelector("#next")) request_page(event.target, '#previous', 1)
+                else if (event.target == this.querySelector("#previous")) request_page(event.target, '#next', -1)
+            })
+
+
+
             class checkbox {
                 constructor() {}
                 setChild(cssSelector) {
@@ -178,11 +229,11 @@
                 let compose = document.createElement("div")
                 compose.classList.add("no-mobile", "compose-area")
                 let html = `
-                    <div class="ca-menu fw-bold black">
+                    <div class="ca-menu fw-bold light">
                         <span class="m0">New Message</span>
                         <div class="c-cross small">X</div>
                     </div>
-                    <span class="black">To</span>
+                    <span class="light">To</span>
                     <input placeholder="Recepient" class="light" name="receiver" type="text">
                     <input placeholder="Subject" class="light" type="text" name="subject">
                     <textarea placeholder="Message" class="small light" name="message"></textarea>
@@ -263,9 +314,10 @@
             });
             
 
-            (function() {
-                let json_mails = `{{mails | myjson | safe}}`
-                let mails = JSON.parse(json_mails)
+            let json_mails = `{{mails['mails'] | myjson | safe}}`
+            let mails = JSON.parse(json_mails) 
+            function dateManager(mails) {
+
                 let dateElems = document.querySelectorAll(".menu > .date")
                 const currentDate = new Date()
 
@@ -283,7 +335,9 @@
                         dateElems[i].innerHTML = `${Math.floor(delta / 60)}hours`
                     } else {dateElems[i].innerHTML = date.toLocaleDateString("en-GB", {day: "numeric", month: "short"})}
                 }
-            })()
+            }
+            dateManager(mails)
+
 
             if (window.innerWidth < 768) {
                 let timeout;

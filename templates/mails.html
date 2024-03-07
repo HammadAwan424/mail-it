@@ -1,0 +1,40 @@
+{%- macro read(state) %}
+{{'dark' if state else 'light fw-bold'}}
+{%- endmacro %}
+
+{%- macro create(mails) %}
+{%- for mail in mails %}
+    <tr class="hover">
+        <!--Sender Bubble-->
+        <td class="no-desktop light">
+            <div class="bubble-sender" style="background-color: {{mail.sender[2]}};">
+                <div class="front"><span class="center">{{ mail.sender[1].title()[0] }}</span></div>
+                <div class="back"><i class="gg-check center"></i></div>
+            </div>
+        </td>
+
+        <!--Icons for Desktops-->
+        <td class="no-mobile first"><div class="main"><input type="checkbox" class="form-check-input icon" id="checkbox{{loop.index}}"></div></td>
+        <td class="no-mobile second"><label class="overflow {{read(mail.read)}}" for="checkbox{{loop.index}}">{{ mail.sender[1].title() }}</label></td>
+        <td class="no-mobile third icon side"><div class="main"><i class="gg-trash black"></i></div></td>
+        <td class="no-mobile fourth icon"><div class="main"><i class="gg-check-r black"></i></div></td>
+        <td class="no-mobile fifth icon"><div class="main"><i class="gg-more-vertical-alt black"></i></td>
+        
+        <!--Main Message-->
+        <td class="sixth overflow" data-mail-id="{{mail.mail_id}}">
+            <div class="no-desktop sender overflow {{read(mail.read)}}">{{ mail.sender[1].title() }}</div>
+            <div class="no-desktop title overflow {{read(mail.read)}}">Did you see thes 100$?</div>
+            <div class="no-desktop message small fw-normal dark overflow">{{ mail.message }}</div>
+            <div id="child" class="no-mobile message overflow {{read(mail.read)}}">{{ mail.message }}</div>
+        </td>
+
+        <!--Dates-->
+        <td class="menu">
+            <div class="date small mr {{read(mail.read)}}"></div>
+            <i class="no-desktop gg-more-vertical-o dark"></i>
+        </td>
+    </tr>
+{%- endfor %}
+{%- endmacro %}
+
+{{create(mails['mails'])}}
