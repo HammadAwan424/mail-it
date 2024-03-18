@@ -1,6 +1,6 @@
 from flask import session, redirect
-from sqlalchemy import Table, Column, MetaData, Integer, String, Boolean, ForeignKey, create_engine, insert, select, update, exists, func
-from sqlalchemy.dialects.sqlite import TIME, DATE
+from sqlalchemy import Table, Column, MetaData, Integer, String, \
+    Boolean, ForeignKey, create_engine, insert, select, update, exists, func, Date, Time
 from datetime import datetime, timezone
 import json
 from functools import wraps
@@ -26,7 +26,7 @@ users = Table(
     "users", 
     metadata,
     Column("id", Integer, primary_key=True),
-    Column("username", String(30)), #uniqute constraint
+    Column("username", String(30), unique=True),
     Column("password", String),
     Column("color", String)
 )
@@ -38,8 +38,8 @@ mails = Table(
     Column("text", String),
     Column("sender", ForeignKey("users.id"), nullable=False),
     Column("receiver", ForeignKey("users.id"), nullable=False),
-    Column("date", DATE),
-    Column("time", TIME(storage_format="%(hour)02d:%(minute)02d:%(second)02d")),   
+    Column("date", Date()),
+    Column("time", Time()),   
     Column("read", Boolean, default=False)
 )
 
@@ -57,6 +57,7 @@ class Email:
 
         
         # Query to return all mails with the same receiver else sender
+        query = None
         if receiver_id:
             query = select(mails, users).where(mails.c.receiver==receiver_id).join(users, mails.c.sender==users.c.id) 
         if sender_id:
@@ -137,3 +138,6 @@ def myjson(python_mails):
 if __name__ == "__main__":
     print("Metadata was called")
     metadata.create_all(engine)
+
+def create_schema(eng):
+    metadata.create_all(eng)

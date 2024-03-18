@@ -1,40 +1,52 @@
 from flask import Flask, render_template, session, redirect, request, abort
 from flask_session import Session
-from helpers import users, mails, Email, myjson, logged_in
+from helpers import users, mails, Email, myjson, logged_in, create_schema
 import logging
 from sqlalchemy import insert, create_engine, exists, select, update
 import json
+import os
 
 
 app = Flask(__name__)
 
-
-
 app.jinja_env.filters["myjson"] = myjson
 
-#Configure Session 
-app.config["SESSION_TYPE"] = "filesystem"
-app.config["SESSION_FILE_DIR"] = "./session"
+
+# Configure Session 
+app.config['SECRET_KEY'] = os.environ.get("SESSION_SECRET_KEY")
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("POSTGRES_URL_SQLALCHEMY")
+app.config["SESSION_TYPE"] = "sqlalchemy"
 app.config["SESSION_PERMANENT"] = False
-Session(app)
+db = Session(app)
 
-#Configure Logging
-logging.getLogger('werkzeug').disabled = True
-logging.getLogger("sqlalchemy.engine.Engine").disabled = True
-logging.basicConfig(
-    level=logging.DEBUG, filename="logging.log",   
-    format="%(message)s at %(asctime)s",
-    datefmt="%X of %d %b",
-)
 
-engine = create_engine("sqlite:///database.db", echo=False)
+# Initialize Self created Class, Email in helpers.py
+engine = create_engine(os.environ.get("POSTGRES_URL_SQLALCHEMY"))
 Email.engine = engine
+
+
+# Initialize Tables for the first time
+    # with app.app_context():
+    #     db.app.session_interface.db.create_all()
+    # create_schema(engine)
+
+
+# Configure Logging
+# logging.getLogger('werkzeug').disabled = True
+# logging.getLogger("sqlalchemy.engine.Engine").disabled = True
+# logging.basicConfig(
+#     level=logging.DEBUG, filename="logging.log",   
+#     format="%(message)s at %(asctime)s",
+#     datefmt="%X of %d %b",
+# )
+
 
 @app.route("/")
 @logged_in
 def index():
     mails = Email.all_for(receiver_id=session.get('user').get("id"))
     return render_template("index.html", mails=mails)
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
