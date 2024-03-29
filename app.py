@@ -2,33 +2,38 @@ from flask import Flask, render_template, session, redirect, request, abort
 from flask_session import Session
 from helpers import users, mails, Email, myjson, logged_in, create_schema
 import logging
-from sqlalchemy import insert, create_engine, exists, select, update
+from sqlalchemy import insert, create_engine, exists, select, update, Column, Integer, String, Table
 import json
+from flask_sqlalchemy import SQLAlchemy
 import os
-
+from datetime import timedelta
+from config import CONFIG
 
 app = Flask(__name__)
 
+app.config["SQLALCHEMY_DATABASE_URI"] = CONFIG['DATABASE_URL']
+db = SQLAlchemy(app)
+
 app.jinja_env.filters["myjson"] = myjson
 
-
 # Configure Session 
-app.config['SECRET_KEY'] = os.environ.get("SESSION_SECRET_KEY")
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("POSTGRES_URL_SQLALCHEMY")
 app.config["SESSION_TYPE"] = "sqlalchemy"
 app.config["SESSION_PERMANENT"] = False
-db = Session(app)
+app.config['SESSION_SQLALCHEMY'] = db
+app.config['SQLALCHEMY_ECHO'] = True
+app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=30)
+
+Session(app)
 
 
 # Initialize Self created Class, Email in helpers.py
-engine = create_engine(os.environ.get("POSTGRES_URL_SQLALCHEMY"))
+engine = create_engine(CONFIG['DATABASE_URL'])
 Email.engine = engine
 
 
 # Initialize Tables for the first time
-    # with app.app_context():
-    #     db.app.session_interface.db.create_all()
-    # create_schema(engine)
+# with app.app_context():
+#     create_schema(engine)
 
 
 # Configure Logging
@@ -158,3 +163,28 @@ def api(page):
     template =  render_template("mails.html", mails=mails)
     response = myjson({"mails": mails, "template": template})
     return response
+
+@app.route("/hello")
+def hello():
+    return redirect("/world")
+    return "hello world"
+
+@app.route("/world")
+def world():
+    # lst = None
+    # with engine.connect() as conn:
+    #     lst = conn.execute(select(users.c.username)).fetchall()
+    # return str(lst)
+    return "hello world"
+    allusers = users.query.all()
+    return str(allusers)
+    return render_template('login.html')
+    return "world"
+
+@app.route("/set/<name>")
+def set(name):
+    if session.get('name'):
+        return session['name']
+    else:
+        session["name"] = name
+        return "Set the value"

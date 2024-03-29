@@ -7,12 +7,14 @@ from functools import wraps
 import logging
 from typing import List, Dict
 
+
 def logged_in(f):
     @wraps(f)
     def inner(*args,  **kwargs):
-        if session.get("user") is None:
+        user = session.get("user")
+        if user is None:
             return redirect("/login")
-        if not session["user"].get("color"):
+        if not user.get("color"):
             return redirect("/user-profile")
         else:
             return f(*args,  **kwargs)
