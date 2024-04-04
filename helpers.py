@@ -1,6 +1,6 @@
 from flask import session, redirect
 from sqlalchemy import Table, Column, MetaData, Integer, String, \
-    Boolean, ForeignKey, create_engine, insert, select, update, exists, func, Date, Time
+    Boolean, ForeignKey, create_engine, insert, select, update, exists, func, Date, Time, text
 from datetime import datetime, timezone
 import json
 from functools import wraps
@@ -104,25 +104,30 @@ class Email:
         self.date = date
         self.time = time
         if not date:
-            crnt_tm = datetime.now(timezone.utc)
-            self.date = crnt_tm.date()
+            current = datetime.now(timezone.utc)
+            self.date = current.date()
         if not time:
-            self.time = crnt_tm.time()
+            self.time = current.time()
         for key in data:
             setattr(self, key, data[key])
 
-    def set(self):
-        with self.engine.begin() as conn:
-            stmt = insert(mails).values(text=self.message, sender=self.sender, receiver=self.receiver, date=self.date, time=self.time)            
+    def set(self, usrname: bool = False):
+        # set usrname to True if username is stored on self.receiver, false if id
+        rcvr = select(users.c.id).where(users.c.username == self.receiver).scalar_subquery() if usrname else self.receiver
+        stmt = insert(mails).values(text=self.message, sender=self.sender, receiver=rcvr, date=self.date, time=self.time)  
+        
+        with self.engine.begin() as conn:          
             conn.execute(stmt)
 
-            sender = conn.execute(select(users.c.username).where(users.c.id == self.sender)).scalar()
-            receiver = conn.execute(select(users.c.username).where(users.c.id == self.receiver)).scalar()
-            logging.info(f"Email sent from {sender.title()} to {receiver.title()}")
+            # Logs info about the mail sent
+            result = conn.execute(select(
+                select(users.c.username).filter_by(id=self.sender).label("sender"), 
+                select(users.c.username).filter_by(id=rcvr).label("receiver")
+            )).fetchone()
+            logging.info(f"Email sent from {result.sender.title()} to {result.receiver.title()}")
         
     @property
     def engine(cls):
-        print("class property is used")
         if cls._engine == None:
             raise ValueError("Missing Engine")
         else:

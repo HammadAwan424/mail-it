@@ -2,7 +2,7 @@ from flask import Flask, render_template, session, redirect, request, abort
 from flask_session import Session
 from helpers import users, mails, Email, myjson, logged_in, create_schema
 import logging
-from sqlalchemy import insert, create_engine, exists, select, update, Column, Integer, String, Table
+from sqlalchemy import insert, create_engine, exists, select, update, Column, Integer, String, Table, text
 import json
 from flask_sqlalchemy import SQLAlchemy
 import os
@@ -144,8 +144,8 @@ def send():
         "subject": request.args.get("subject"),
         "message": request.args.get("message")
     }
-    sent_mail = Email(data["message"], data["sender"], data["receiver"])
-    sent_mail.set()
+    mail = Email(data["message"], data["sender"], data["receiver"])
+    mail.set(usrname=True)
     return "sucess"
 
 @app.route("/page/<int:page>")
@@ -188,3 +188,31 @@ def set(name):
     else:
         session["name"] = name
         return "Set the value"
+    
+@app.route("/union")
+def union():
+    # first = select(("sender " + users.c.username).label("s")).where(users.c.id == 1)
+    # second = select(("receiver " + users.c.username).label("r")).where(users.c.id == 2)
+    # q = first.union(second)
+    # print(q)
+    with engine.connect() as conn:
+
+        # result = conn.execute(text(
+        #     "SELECT (SELECT users.username FROM users WHERE users.id = :sid) as sender, \
+        #         (SELECT users.username FROM users WHERE users.id = :rid) as receiver"
+        #     ), {"sid": 2, "rid": 1}).fetchone()
+        # first = select(users.c.username.label("ds")).filter_by(id=1).cte()
+        # second = select(users.c.username).filter_by(id=2).cte()
+
+        # first = select(users.c.username).filter_by(id=1).label("sender")
+        # second = select(users.c.username).filter_by(id=2).label("receiver")
+        # result = conn.execute(select(
+        #     select(users.c.username).filter_by(id=1).label("sender"), 
+        #     select(users.c.username).filter_by(id=2).label("receiver")
+        # )).fetchone()
+        rcvr = select(users.c.id).where(users.c.username == "hammad").scalar_subquery()
+        stmt = select(users).where(users.c.id == rcvr)
+        result = conn.execute(stmt)
+        print(result.fetchone())
+        print(stmt)
+    return "successful"
