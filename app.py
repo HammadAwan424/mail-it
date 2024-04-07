@@ -2,12 +2,12 @@ from flask import Flask, render_template, session, redirect, request, abort
 from flask_session import Session
 from helpers import users, mails, Email, myjson, logged_in, create_schema
 import logging
-from sqlalchemy import insert, create_engine, exists, select, update, Column, Integer, String, Table, text
+from sqlalchemy import insert, create_engine, exists, select, update, Column, Integer, String, Table
 import json
 from flask_sqlalchemy import SQLAlchemy
 import os
-from datetime import timedelta
 from config import CONFIG
+from datetime import timedelta
 
 app = Flask(__name__)
 
@@ -24,7 +24,6 @@ app.config['SQLALCHEMY_ECHO'] = True
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=30)
 
 Session(app)
-
 
 # Initialize Self created Class, Email in helpers.py
 engine = create_engine(CONFIG['DATABASE_URL'])
@@ -120,10 +119,10 @@ def register():
     if len(data[1]) < 8:
         return "Atleast 8 characters are required"
     
-    stmt = insert(users).values(username=data[0], password=data[1])
+    stmt = insert(users).values(username=data[0], password=data[1]).returning(users.c.id)
     with engine.begin() as conn:
-        result = conn.execute(stmt)
-        session["user"] = {"id": result.lastrowid ,"username": data[0]}
+        result = conn.execute(stmt).fetchone()
+        session["user"] = {"id": result.id ,"username": data[0]}
         logging.info(f"Registered a User: {data[0]}")
         return redirect("/user-profile")
     
@@ -163,56 +162,3 @@ def api(page):
     template =  render_template("mails.html", mails=mails)
     response = myjson({"mails": mails, "template": template})
     return response
-
-@app.route("/hello")
-def hello():
-    return redirect("/world")
-    return "hello world"
-
-@app.route("/world")
-def world():
-    # lst = None
-    # with engine.connect() as conn:
-    #     lst = conn.execute(select(users.c.username)).fetchall()
-    # return str(lst)
-    return "hello world"
-    allusers = users.query.all()
-    return str(allusers)
-    return render_template('login.html')
-    return "world"
-
-@app.route("/set/<name>")
-def set(name):
-    if session.get('name'):
-        return session['name']
-    else:
-        session["name"] = name
-        return "Set the value"
-    
-@app.route("/union")
-def union():
-    # first = select(("sender " + users.c.username).label("s")).where(users.c.id == 1)
-    # second = select(("receiver " + users.c.username).label("r")).where(users.c.id == 2)
-    # q = first.union(second)
-    # print(q)
-    with engine.connect() as conn:
-
-        # result = conn.execute(text(
-        #     "SELECT (SELECT users.username FROM users WHERE users.id = :sid) as sender, \
-        #         (SELECT users.username FROM users WHERE users.id = :rid) as receiver"
-        #     ), {"sid": 2, "rid": 1}).fetchone()
-        # first = select(users.c.username.label("ds")).filter_by(id=1).cte()
-        # second = select(users.c.username).filter_by(id=2).cte()
-
-        # first = select(users.c.username).filter_by(id=1).label("sender")
-        # second = select(users.c.username).filter_by(id=2).label("receiver")
-        # result = conn.execute(select(
-        #     select(users.c.username).filter_by(id=1).label("sender"), 
-        #     select(users.c.username).filter_by(id=2).label("receiver")
-        # )).fetchone()
-        rcvr = select(users.c.id).where(users.c.username == "hammad").scalar_subquery()
-        stmt = select(users).where(users.c.id == rcvr)
-        result = conn.execute(stmt)
-        print(result.fetchone())
-        print(stmt)
-    return "successful"

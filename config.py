@@ -1,2 +1,5 @@
+import os
+
 CONFIG = {}
-CONFIG['DATABASE_URL'] = 'sqlite:///C:\\Users\\Hammad\Code\\flask-hello-world\\session.db'
+dburl = os.environ.get("POSTGRES_URL_SQLALCHEMY")
+CONFIG['DATABASE_URL'] = dburl
