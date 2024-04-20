@@ -36,20 +36,20 @@ Email.engine = engine
 
 
 # Configure Logging
-# logging.getLogger('werkzeug').disabled = True
-# logging.getLogger("sqlalchemy.engine.Engine").disabled = True
-# logging.basicConfig(
-#     level=logging.DEBUG, filename="logging.log",   
-#     format="%(message)s at %(asctime)s",
-#     datefmt="%X of %d %b",
-# )
+logging.getLogger('werkzeug').disabled = True
+logging.getLogger("sqlalchemy.engine.Engine").disabled = True
+logging.basicConfig(
+    level=logging.DEBUG, filename="logging.log",   
+    format="%(message)s at %(asctime)s",
+    datefmt="%X of %d %b",
+)
 
 
 @app.route("/")
 @logged_in
 def index():
     mails = Email.all_for(receiver_id=session.get('user').get("id"))
-    return render_template("index.html", mails=mails)
+    return render_template("index.html", mails=mails, serverSideJson=myjson(mails))
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -134,31 +134,40 @@ def read():
     Email.is_read(mail_id=mail, user_id=session["user"]["id"])
     return myjson({"status": "success", "message": f"Email {mail} marked as read"})
 
-@app.route("/send")
+@app.route("/send", methods=["GET", "POST"])
 @logged_in
 def send():
     data = {
         "sender": session["user"]["id"],
-        "receiver": request.args.get("receiver"),
-        "subject": request.args.get("subject"),
-        "message": request.args.get("message")
+        "receiver": request.json.get("receiver"),
+        "subject": request.json.get("subject"),
+        "message": request.json.get("message")
     }
     mail = Email(data["message"], data["sender"], data["receiver"])
     mail.set(usrname=True)
-    return "sucess"
+    return "success"
 
-@app.route("/page/<int:page>")
-@logged_in
-def page(page):
-    mails = Email.all_for(receiver_id=session["user"]["id"], offset=page)
-    return myjson(mails)
 
 @app.route("/api/page/<int:page>")
 @logged_in
 def api(page):
-    mails = Email.all_for(receiver_id=session["user"]["id"], offset=page)
+    mails = Email.all_for(receiver_id=session["user"]["id"], page=page)
     if not len(mails['mails']):
         return abort(404)
-    template =  render_template("mails.html", mails=mails)
+    template =  render_template("mails.html", serverSideMails=mails['mails'], page_request=True)
     response = myjson({"mails": mails, "template": template})
     return response
+
+@app.route("/autocomplete/<mode>/<query>")
+@logged_in
+def autocomplete(mode, query):
+    if mode == "username":
+        stmt = select(users).where(users.c.username.startswith(query)).limit(3)
+        conn = engine.connect()
+        result = conn.execute(stmt).mappings().all()
+        return render_template("mails.html", serverSideUsers=result, user_search_request=True)
+        conn.close()
+    if mode == "mails":
+        id = session.get('user').get("id")
+        result = Email.all_for(receiver_id=id, lmt=3, contains=query)['mails']
+        return render_template("mails.html", serverSideMails=result, mail_search_request=True)

@@ -1,8 +1,5 @@
-{%- macro read(state) %}
-{{'dark' if state else 'light fw-bold'}}
-{%- endmacro %}
-
-{%- macro create(mails) %}
+<!--This macro returns new Pages-->
+{%- macro give_page(mails) %}
 {%- for mail in mails %}
     <tr class="hover">
         <!--Sender Bubble-->
@@ -24,8 +21,8 @@
         <td class="sixth overflow" data-mail-id="{{mail.mail_id}}">
             <div class="no-desktop sender overflow {{read(mail.read)}}">{{ mail.sender[1].title() }}</div>
             <div class="no-desktop title overflow {{read(mail.read)}}">Did you see thes 100$?</div>
-            <div class="no-desktop message small fw-normal dark overflow">{{ mail.message }}</div>
-            <div id="child" class="no-mobile message overflow {{read(mail.read)}}">{{ mail.message }}</div>
+            <div class="no-desktop message small fw-normal dark overflow">{{ mail.text }}</div>
+            <div id="child" class="no-mobile message overflow {{read(mail.read)}}">{{ mail.text }}</div>
         </td>
 
         <!--Dates-->
@@ -37,4 +34,70 @@
 {%- endfor %}
 {%- endmacro %}
 
-{{create(mails['mails'])}}
+
+<!--This macro returns mails when searched through search bar-->
+{%- macro search_mails(mails) %}
+<style>
+    .mail_search .second {
+        width: 15%;
+        padding: 1rem;
+    }
+</style>
+{%- for mail in mails %}
+<table class="mail_search">
+    <tr class="hover">
+        <!--Bubble for sender, Mobile only-->
+        <td class="no-desktop light">
+            <div class="bubble-sender" style="background-color: {{mail.sender[2]}};">
+                <div class="front"><span class="center">{{ mail.sender[1].title()[0] }}</span></div>
+                <div class="back"><i class="gg-check center"></i></div>
+            </div>
+        </td>
+
+        <!--Username(sender) for Desktop-->
+        <td class="no-mobile second"><div class="overflow sndr-d {{read(mail.read)}}">{{ mail.sender[1].title() }}</div></td>
+        
+        <!--Main Message-->
+        <td class="sixth overflow" data-mail-id="{{mail.mail_id}}">
+            <div class="no-desktop sndr-m overflow {{read(mail.read)}}">{{ mail.sender[1].title() }}</div>
+            <div class="no-desktop title overflow {{read(mail.read)}}">Did you see thes 100$?</div>
+            <div class="no-desktop message small fw-normal dark overflow">{{ mail.text }}</div>
+            <div id="child" class="no-mobile message overflow dark">{{ mail.text }}</div>
+        </td>
+
+        <!--Dates-->
+        <td class="menu dark">
+            <div class="date small mr"></div>
+            <i class="no-desktop gg-more-vertical-o"></i>
+        </td>
+    </tr>
+</table>
+{%- endfor %}
+{%- endmacro %}
+
+
+<!--This macro returns usernames when searched through compose page-->
+{%- macro search_users(users) %}
+<ul class="dark">
+    {% for user in users %}
+    <li>{{user.username}}</li>
+    {% endfor %}
+</ul>
+{%- endmacro %}
+
+
+<!--This macro returns css classes based on boolean param-->
+{%- macro read(is_read) %}
+{{'dark' if is_read else 'light fw-bold'}}
+{%- endmacro %}
+
+
+
+
+{% if page_request %}
+    {{give_page(serverSideMails)}}
+{% elif mail_search_request %}
+    {{search_mails(serverSideMails)}}
+{% elif user_search_request %}
+    {{search_users(serverSideUsers)}}
+{% endif %}

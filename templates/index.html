@@ -5,7 +5,7 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
         <link href="https://css.gg/css" rel="stylesheet">
         <link href="{{ url_for('static', filename='index.css') }}" rel="stylesheet">
-        <link href="{{ url_for('static', filename='m.css') }}" rel="stylesheet">
+        <script src="{{url_for('static', filename='index.js')}}"></script>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{% block title %}Homepage{% endblock %}</title>
         {%- block style %}
@@ -24,6 +24,9 @@
     <body>      
         {%- block body %}      
         <div class="grid">
+
+
+             <!--Top(first) Child of grid containing search bar-->
             <div class="top">
                 <div class="basic no-mobile light">
                     <div class="bubble"><i class="gg-menu"></i></div>
@@ -32,7 +35,7 @@
                 <form class="search_bar" action="/null" method="get">
                     <div class="bubble-menu no-desktop"><i class="gg-menu light center"></i></div>
                     <i class="gg-search no-mobile"></i>
-                    <input class="light" placeholder="Search in emails">
+                    <input id="searchbar" class="light" placeholder="Search in emails">
                     <div class="bubble-user no-desktop"><p class="center light">{{ session.user.username.title()[0] }}</p></div>
                     <div class="search-result"></div>
                 </form>
@@ -40,13 +43,21 @@
                 <p class="dark small p no-desktop">Primary</p>  
             </div> 
 
-            <!--Left(2) child of grid-->
+
+            <!--Left(second) child of grid-->
             <div class="sidebar-desk">
-                <div class="sd-container">
-                    <button class="uni-btn c-btn light">Compose</button>
-                </div>
+                <button class="uni-btn compose-btn light">Compose</button>
+
+                <!--Nav bar for Desktop-->
+                <ul class="navv light">
+                    <li><a href="#inbox">Inbox</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#More">More</a></li>
+                    <li><a href="#Moreover">MOreover</a></li>
+                </ul>
             </div>
 
+            <!--Right(third) child of grid-->
             <div class="right">
                 {% if mails %}
                 <div class="topbar light no-mobile">
@@ -86,11 +97,11 @@
                             <td class="no-mobile fifth icon"><div class="main"><i class="gg-more-vertical-alt black"></i></td>
                             
                             <!--Main Message-->
-                            <td class="sixth overflow" data-mail-id="{{mail.mail_id}}">
+                            <td class="sixth overflow" data-mail-id="{{mail['mail_id']}}">
                                 <div class="no-desktop sender overflow {{read(mail.read)}}">{{ mail.sender[1].title() }}</div>
                                 <div class="no-desktop title overflow {{read(mail.read)}}">Did you see thes 100$?</div>
-                                <div class="no-desktop message small fw-normal dark overflow">{{ mail.message }}</div>
-                                <div id="child" class="no-mobile message overflow {{read(mail.read)}}">{{ mail.message }}</div>
+                                <div class="no-desktop message small fw-normal dark overflow">{{ mail.text }}</div>
+                                <div id="child" class="no-mobile message overflow {{read(mail.read)}}">{{ mail.text }}</div>
                             </td>
 
                             <!--Dates-->
@@ -102,269 +113,33 @@
                     {%- endfor %}
                 </table>  
                 <div class="sidebar-mob no-desktop"></div>
-            </div>            
+                <div id="jsonContainer" data-json="{{serverSideJson}}"></div>
+            </div> 
+            
+            <!-- THe below one must be removed-->
+            <div class="no-mobile compose-area">
+                <div class="ca-menu fw-bold light">
+                    <span class="m0">New Message</span>
+                    <div class="c-cross small">X</div>
+                </div>
+                <span class="light">To</span>
+                <div id="receiver">
+                    <div class="recepient">
+                        <input class="light input" placeholder="Recepient" name="receiver" type="text" autocomplete="off" autofocus>
+                        <div id="usernames_result">
+                            <ul class="dark">
+                                <li>Aslam</li>
+                                <li>Al</li>
+                                <li>Someone</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <input placeholder="Subject" class="light" type="text" name="subject" autocomplete="off">
+                <textarea placeholder="Message" class="small light" name="message"></textarea>
+                <button class="send light">Send</button>
+            </div>         
         </div>
     </body>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            async function request_page(activeNav, sideSelector, requestedPage) {
-                let secondaryNav = null
-                let clickedNav = activeNav.dataset
-
-                if (clickedNav.page == 0) {
-                    alert("You are already at first page")
-                    return 
-                }
-
-                let response = await fetch(`/api/page/${clickedNav.page}`)
-                if (response.status != 200) {
-                    alert("No more pages")
-                    return 
-                }
-
-                if (requestedPage > 0) {
-                    secondaryNav = document.querySelector(sideSelector).dataset
-                }
-                else {
-                    secondaryNav = document.querySelector(sideSelector).dataset
-                }
-                
-                children = document.querySelectorAll("tr")
-                children.forEach(function(child) {child.remove()})
-
-                //json containing mails data and template data
-                json = await response.json()
-                document.querySelector("tbody").innerHTML = json["template"]
-                
-                from = (Number(clickedNav.page) - 1) * json.mails.per_page + 1
-                to = Number(clickedNav.page) * json.mails.per_page
-                document.querySelector(".page > .rect").innerHTML = `${from}-${to} of ${json.mails.total}`
-                clickedNav.page = Number(clickedNav.page) + requestedPage
-                secondaryNav.page = Number(secondaryNav.page) + requestedPage
-                
-                checkboxManager.setChild("td .form-check-input")
-                checkboxManager.setParent("#all-checkboxes")
-                checkboxManager.activeChild()
-                checkboxManager.activeParent()
-
-                dateManager(json['mails']['mails'])
-                console.log(json)
-            }
-
-            document.querySelector(".page").addEventListener('click', function(event) {
-                if (event.target == this.querySelector("#next")) request_page(event.target, '#previous', 1)
-                else if (event.target == this.querySelector("#previous")) request_page(event.target, '#next', -1)
-            })
-
-
-
-            class checkbox {
-                constructor() {}
-                setChild(cssSelector) {
-                    this.childCheckboxes = document.querySelectorAll(cssSelector)
-                }
-                setParent(cssSelector) {
-                    this.parentCheckbox = document.querySelector(cssSelector)
-                }
-                activeParent() { // array of children checkboxes
-                    let array = this.childCheckboxes
-                    if (array.length < 0) {
-                        return
-                    }
-                    this.parentCheckbox.addEventListener("change", function() {
-                        if (this.checked) {
-                            array.forEach(function(box) {
-                                if (!box.checked) {box.click()}
-                            })
-                        }
-                        else {array.forEach(function(box) {
-                            box.click()
-                        })}
-                    })
-                }
-                activeChild() {
-                    let array = this.childCheckboxes
-                    let obj = this
-                    let num = 0
-                    for (let i = 0; i < array.length; i++) {
-                        array[i].addEventListener("change", function() {
-                            array[i].closest("tr").classList.toggle("selection")
-                            if (array[i].checked) {num += 1}
-                            else {num -= 1}
-                            obj.counter(num, obj)
-                        })
-                    };
-                }
-                counter(num, obj) { // checked checkboxes num and max number of checkboxex
-                    let max = obj.childCheckboxes.length
-                    if (num == 0) {
-                        document.querySelector(".topbar > .onselection").classList.add("hidden")
-                    }
-                    if (num > 0) {
-                        document.querySelector(".topbar > .onselection").classList.remove("hidden")
-                        document.querySelector(".onselection .rect").innerHTML = `${num} items selected`
-                        if (num == max) {
-                            obj.parentCheckbox.checked = true
-                        } else {
-                            obj.parentCheckbox.checked = false
-                        }
-                    }   
-                }
-            }
-
-            const checkboxManager = new checkbox()
-            checkboxManager.setChild("td .form-check-input")
-            checkboxManager.setParent("#all-checkboxes")
-            checkboxManager.activeChild()
-            checkboxManager.activeParent()
-
-            function innerHTML(selector) {
-                return document.querySelector(selector).value
-            }
-
-            function renderComposePage() {
-                if (document.querySelector(".compose-area")) {
-                    return
-                }
-                let compose = document.createElement("div")
-                compose.classList.add("no-mobile", "compose-area")
-                let html = `
-                    <div class="ca-menu fw-bold light">
-                        <span class="m0">New Message</span>
-                        <div class="c-cross small">X</div>
-                    </div>
-                    <span class="light">To</span>
-                    <input placeholder="Recepient" class="light" name="receiver" type="text">
-                    <input placeholder="Subject" class="light" type="text" name="subject">
-                    <textarea placeholder="Message" class="small light" name="message"></textarea>
-                    <button class="send light">Send</button>
-                `
-                compose.innerHTML = html
-                document.querySelector(".grid").appendChild(compose)
-                
-                compose.querySelector(".c-cross").addEventListener("click", function() {
-                    document.querySelector('.compose-area').remove()
-                })
-                compose.querySelector(".send").addEventListener("click", async function() {
-                    let data = [
-                        innerHTML("input[placeholder='Recepient']"),
-                        innerHTML("input[placeholder='Subject']"),
-                        innerHTML("textarea[placeholder='Message']")
-                        ]
-
-                    let url = `/send?receiver=${data[0]}&subject=${data[1]}&message=${data[2]}`
-                    await fetch(url)
-                    console.log(data)
-                })
-            }
-
-            //Compose page loader
-            let deskSidebar = document.querySelectorAll(".sd-container > *")
-            deskSidebar[0].addEventListener("click", renderComposePage)
-
-
-
-            let input = document.querySelector(".search_bar > input")
-            input.addEventListener("input", async function() {
-                // let bottom = this.parentNode.querySelector(".search-result")
-                // bottom.classList.remove("hidden")
-            //     let response = await fetch(`/send?q=${search.value}`)
-            //     console.log(response.text())
-            })
-
-            document.querySelectorAll("tr > .sixth").forEach(function(tr) {
-                tr.addEventListener("click", async function() {
-                    let id = this.dataset.mailId
-                    let response = fetch(`/read?mail_id=${id}`)
-                })
-            });
-
-
-            (function deleter() {
-                let trash_icons = document.getElementsByClassName("third")
-
-                for (let icon of trash_icons) {
-                    icon.addEventListener("click", function() {
-                        let tr = this.closest("tr")
-                        tr.querySelector(".side").classList.remove("side")
-                        tr.classList.add("delete")
-                    }) 
-                }
-            })()
-
-            /* PC */
-            document.querySelector(".basic > .bubble").addEventListener("click", function() {
-                document.querySelector(".sidebar-desk").classList.toggle("animate") 
-            })
-
-            // Mobile
-            document.querySelector(".search_bar > .bubble-menu").addEventListener("click", function() {
-                let bar = document.querySelector(".sidebar-mob")
-                bar.classList.add("sidebar-toggle")
-                window.setTimeout(function() {
-                    window.onclick = (pointer) => {
-                        if (pointer.clientX > bar.getBoundingClientRect().right) {
-                            console.log("You clicked right to the sidebar")
-                            bar.classList.remove("sidebar-toggle")
-                            window.onclick = null
-                        }
-                    }
-                }, 100)
-                
-            });
-            
-
-            let json_mails = `{{mails['mails'] | myjson | safe}}`
-            let mails = JSON.parse(json_mails) 
-            function dateManager(mails) {
-
-                let dateElems = document.querySelectorAll(".menu > .date")
-                const currentDate = new Date()
-
-                for (let i = 0; i < mails.length; i++) {
-                    let date = new Date(`${mails[i].date}T${mails[i].time}Z`)
-
-                    let delta = (currentDate - date) / (1000 * 60) // stores minutes in delta
-                    if (delta < 1) {
-                        dateElems[i].innerHTML = `Just now`
-                    }
-                    else if (delta < 60) {
-                        dateElems[i].innerHTML = `${Math.floor(delta)}mins`
-                    }
-                    else if (delta < 1400) {
-                        dateElems[i].innerHTML = `${Math.floor(delta / 60)}hours`
-                    } else {dateElems[i].innerHTML = date.toLocaleDateString("en-GB", {day: "numeric", month: "short"})}
-                }
-            }
-            dateManager(mails)
-
-
-            if (window.innerWidth < 768) {
-                let timeout;
-                console.log('ready')
-
-                for (let tr of document.querySelectorAll("tr")) {
-                    tr.addEventListener("mousedown", function() {
-                        console.log("detected hold,")
-                        timeout = setTimeout(function() {
-                            console.log("The animation should play")
-                            tr.querySelector(".bubble-sender").classList.add("bubble-animate")
-                            tr.querySelector(".bubble-sender").addEventListener("click", function() {
-                                this.classList.remove("bubble-animate")
-                        })
-                        }, 500)
-                        console.log(`timer set as ${timeout}`)
-                    })
-                }
-
-                window.addEventListener("mouseup", function() {
-                    console.log("detected up")
-                    clearTimeout(timeout)
-                    console.log("timer cleard")
-                })
-            }
-        })
-    </script>
     {% endblock %}
 </html>

@@ -52,43 +52,35 @@ class Email:
 
     # Pass any one of the below kwargs
     @classmethod
-    def all_for(cls, receiver_id=None, sender_id=None, offset=1) -> Dict:
+    def all_for(cls, receiver_id=None, sender_id=None, page=1, lmt=4, contains=''):
         # Give specified page based on the value of offset, lmt mails per page
-        lmt = 4
-        page = (offset-1)*lmt
+        page = (page-1)*lmt
 
         
         # Query to return all mails with the same receiver else sender
         query = None
+        c = mails.c.id.label("mail_id")
         if receiver_id:
-            query = select(mails, users).where(mails.c.receiver==receiver_id).join(users, mails.c.sender==users.c.id) 
+            query = select(c, mails, users).where(mails.c.receiver==receiver_id).join(users, mails.c.sender==users.c.id) 
         if sender_id:
             query = select(mails, users).where(mails.c.sender==sender_id).join(users, mails.c.receiver==users.c.id)
-        stmt = query.order_by(mails.c.date.desc(), mails.c.time.desc()).offset(page).limit(lmt)
+        stmt = query.order_by(mails.c.date.desc(), mails.c.time.desc()).offset(page).limit(lmt).where(mails.c.text.contains(contains))
         
 
         mail_dicts = []
         with cls.engine.connect() as conn:
             column = (mails.c.receiver, receiver_id) if receiver_id else (mails.c.sender, sender_id)
             mail_count = conn.execute(select(func.count(mails.c.id)).where(column[0] == column[1])).scalar()
+            
 
-            for mail in conn.execute(stmt): 
-                single_mail = {
-                    "mail_id": mail.id,
-                    "message": mail.text,
-                    "receiver": mail.receiver,
-                    "sender": mail.sender,
-                    "date": mail.date,
-                    "time": mail.time,
-                    "date": mail.date,
-                    "read": mail.read
-                }       
+            for mapping in conn.execute(stmt).mappings().all():
+                mail = dict(mapping)
                 if receiver_id:
-                    single_mail["sender"] = (mail.sender, mail.username, mail.color)
+                    mail["sender"] = (mail['sender'], mail['username'], mail['color'])
                 elif sender_id:
-                    single_mail["receiver"] = (mail.receiver, mail.username, mail.color)
-                mail_dicts.append(single_mail)
-            return {"total": mail_count, "mails": mail_dicts, "count": len(mail_dicts), "per_page": lmt}
+                    mail["receiver"] = (mail.receiver, mail.username, mail.color)
+                mail_dicts.append(mail)
+            return {"total": mail_count, "mails": mail_dicts, "count": len(mail_dicts), "perPage": lmt}
         
 
     @classmethod
