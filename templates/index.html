@@ -29,7 +29,7 @@
              <!--Top(first) Child of grid containing search bar-->
             <div class="top">
                 <div class="basic no-mobile light">
-                    <div class="bubble"><i class="gg-menu"></i></div>
+                    <div id="hamburger" class="bubble-menu"><i class="gg-menu center"></i></div>
                     <h4>Mail</h4>
                 </div>
                 <form class="search_bar" action="/null" method="get">
@@ -44,7 +44,7 @@
             </div> 
 
 
-            <!--Left(second) child of grid-->
+            <!--Left(second) child of grid, contains Sidebar-->
             <div class="sidebar-desk">
                 <button class="uni-btn compose-btn light">Compose</button>
 
@@ -57,30 +57,30 @@
                 </ul>
             </div>
 
-            <!--Right(third) child of grid-->
+            <!--Right(third) child of grid, contains Mails and all the core content-->
             <div class="right">
                 {% if mails %}
                 <div class="topbar light no-mobile">
-                    <div class="main"><input type="checkbox" class="form-check-input icon" id="all-checkboxes"></div>
+                    <div class="icon-container"><input type="checkbox" class="form-check-input icon" id="all-checkboxes"></div>
 
                     <div class="onselection f-b hidden">
                         <div class="rect mr"><span>5 items Selected</span></div>
-                        <div class="main mr icon"><i class="gg-trash black"></i></div>
-                        <div class="main mr icon"><i class="gg-check-r black"></i></div>
-                        <div class="main mr icon"><i class="gg-more-vertical-alt black" ></i></div>
+                        <div class="icon-container mr icon"><i class="gg-trash black"></i></div>
+                        <div class="icon-container mr icon"><i class="gg-check-r black"></i></div>
+                        <div class="icon-container mr icon"><i class="gg-more-vertical-alt black" ></i></div>
                     </div>
                     <div class="space"></div>
-                    <div class="page f-b small">
+                    <div class="page-nav f-b small">
                         <div class="rect small">1-{{mails['count']}} of {{mails['total']}}</div>
-                        <div id="previous" data-page="0" class="main icon">&lt;</div>
-                        <div id="next" data-page="2" class="main icon">&gt;</div>
+                        <div id="previous" data-page="0" class="icon-container icon">&lt;</div>
+                        <div id="next" data-page="2" class="icon-container icon">&gt;</div>
                     </div>
                 {% endif %}
                     
                 </div>
                 <table>
                     {%- for mail in mails['mails'] %}
-                        <tr class="hover">
+                        <tr class="mail" data-mail-id="{{mail.mail_id}}">
                             <!--Sender Bubble-->
                             <td class="no-desktop light">
                                 <div class="bubble-sender" style="background-color: {{mail.sender[2]}};">
@@ -89,12 +89,14 @@
                                 </div>
                             </td>
 
-                            <!--Icons for Desktops-->
-                            <td class="no-mobile first"><div class="main"><input type="checkbox" class="form-check-input icon" id="checkbox{{loop.index}}"></div></td>
+                            <!--Icons for Desktops, includes sender-->
+                            <td class="no-mobile first"><div class="icon-container"><input type="checkbox" class="form-check-input icon" id="checkbox{{loop.index}}"></div></td>
                             <td class="no-mobile second"><label class="overflow {{read(mail.read)}}" for="checkbox{{loop.index}}">{{ mail.sender[1].title() }}</label></td>
-                            <td class="no-mobile third icon side"><div class="main"><i class="gg-trash black"></i></div></td>
-                            <td class="no-mobile fourth icon"><div class="main"><i class="gg-check-r black"></i></div></td>
-                            <td class="no-mobile fifth icon"><div class="main"><i class="gg-more-vertical-alt black"></i></td>
+                            <td class="no-mobile third icon side"><div class="icon-container"><i class="gg-trash black"></i></div></td>
+                            <td class="no-mobile fourth icon"><div class="icon-container"><i class="gg-check-r black"></i></div></td>
+                            <td class="no-mobile fifth icon">
+                                <div class="icon-container"><i class="gg-more-vertical-alt black"></i></div>
+                            </td>
                             
                             <!--Main Message-->
                             <td class="sixth overflow" data-mail-id="{{mail['mail_id']}}">
@@ -114,31 +116,7 @@
                 </table>  
                 <div class="sidebar-mob no-desktop"></div>
                 <div id="jsonContainer" data-json="{{serverSideJson}}"></div>
-            </div> 
-            
-            <!-- THe below one must be removed-->
-            <div class="no-mobile compose-area">
-                <div class="ca-menu fw-bold light">
-                    <span class="m0">New Message</span>
-                    <div class="c-cross small">X</div>
-                </div>
-                <span class="light">To</span>
-                <div id="receiver">
-                    <div class="recepient">
-                        <input class="light input" placeholder="Recepient" name="receiver" type="text" autocomplete="off" autofocus>
-                        <div id="usernames_result">
-                            <ul class="dark">
-                                <li>Aslam</li>
-                                <li>Al</li>
-                                <li>Someone</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                <input placeholder="Subject" class="light" type="text" name="subject" autocomplete="off">
-                <textarea placeholder="Message" class="small light" name="message"></textarea>
-                <button class="send light">Send</button>
-            </div>         
+            </div>
         </div>
     </body>
     {% endblock %}

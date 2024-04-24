@@ -1,4 +1,4 @@
-<!--This macro returns new Pages-->
+<!--This macro returns HTML for new Pages-->
 {%- macro give_page(mails) %}
 {%- for mail in mails %}
     <tr class="hover">
@@ -35,7 +35,7 @@
 {%- endmacro %}
 
 
-<!--This macro returns mails when searched through search bar-->
+<!--This macro returns HTML for mails when searched through search bar-->
 {%- macro search_mails(mails) %}
 <style>
     .mail_search .second {
@@ -76,24 +76,24 @@
 {%- endmacro %}
 
 
-<!--This macro returns usernames when searched through compose page-->
+<!--This macro returns HTML for usernames when searched through compose page-->
 {%- macro search_users(users) %}
 <ul class="dark">
     {% for user in users %}
-    <li>{{user.username}}</li>
+    <li>{{user.username.capitalize()}}</li>
     {% endfor %}
 </ul>
 {%- endmacro %}
 
 
-<!--This macro returns css classes based on boolean param-->
+<!--This macro returns HTML for css classes based on boolean param-->
 {%- macro read(is_read) %}
 {{'dark' if is_read else 'light fw-bold'}}
 {%- endmacro %}
 
 
 
-
+<!--This part Uses the above macros when passed the Specified Boolean-->
 {% if page_request %}
     {{give_page(serverSideMails)}}
 {% elif mail_search_request %}

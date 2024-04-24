@@ -1,6 +1,6 @@
 from flask import session, redirect
 from sqlalchemy import Table, Column, MetaData, Integer, String, \
-    Boolean, ForeignKey, create_engine, insert, select, update, exists, func, Date, Time, text
+    Boolean, ForeignKey, create_engine, insert, select, delete, update, exists, func, Date, Time, text
 from datetime import datetime, timezone
 import json
 from functools import wraps
@@ -28,7 +28,7 @@ users = Table(
     "users", 
     metadata,
     Column("id", Integer, primary_key=True),
-    Column("username", String(30), unique=True),
+    Column("username", String, unique=True),
     Column("password", String),
     Column("color", String)
 )
@@ -50,20 +50,36 @@ mails = Table(
 class Email:
     _engine = None
 
+    @property
+    def engine(cls):
+        if cls._engine == None:
+            raise ValueError("Missing Engine")
+        else:
+            return cls._engine     
+
+    @engine.setter
+    def engine(cls, eng):
+        cls._engine = eng
+
+
     # Pass any one of the below kwargs
     @classmethod
     def all_for(cls, receiver_id=None, sender_id=None, page=1, lmt=4, contains=''):
+        if receiver_id is None and sender_id is None:
+            raise TypeError("Need receiver or sender id")
+        elif receiver_id is not None and sender_id is not None:
+            raise TypeError("Can't have receiver and sender id simultaneously")
+
         # Give specified page based on the value of offset, lmt mails per page
         page = (page-1)*lmt
 
-        
         # Query to return all mails with the same receiver else sender
         query = None
         c = mails.c.id.label("mail_id")
         if receiver_id:
             query = select(c, mails, users).where(mails.c.receiver==receiver_id).join(users, mails.c.sender==users.c.id) 
         if sender_id:
-            query = select(mails, users).where(mails.c.sender==sender_id).join(users, mails.c.receiver==users.c.id)
+            query = select(c, mails, users).where(mails.c.sender==sender_id).join(users, mails.c.receiver==users.c.id)
         stmt = query.order_by(mails.c.date.desc(), mails.c.time.desc()).offset(page).limit(lmt).where(mails.c.text.contains(contains))
         
 
@@ -80,13 +96,19 @@ class Email:
                 elif sender_id:
                     mail["receiver"] = (mail.receiver, mail.username, mail.color)
                 mail_dicts.append(mail)
-            return {"total": mail_count, "mails": mail_dicts, "count": len(mail_dicts), "perPage": lmt}
+        return {"total": mail_count, "mails": mail_dicts, "count": len(mail_dicts), "perPage": lmt}
         
 
     @classmethod
     def is_read(self, mail_id, user_id):
         stmt = update(mails).values(read=True).where(mails.c.id == mail_id, mails.c.receiver == user_id)
         with self.engine.begin() as conn:
+            conn.execute(stmt)
+
+    @classmethod
+    def del_from_db(cls, mail_id, user):
+        stmt = delete(mails).where(mails.c.id==mail_id, mails.c.receiver==user.get('id'))
+        with cls.engine.begin() as conn:
             conn.execute(stmt)
 
     def __init__(self, message, sender, receiver, date=None, time=None, **data):
@@ -106,7 +128,9 @@ class Email:
     def set(self, usrname: bool = False):
         # set usrname to True if username is stored on self.receiver, false if id
         rcvr = select(users.c.id).where(users.c.username == self.receiver).scalar_subquery() if usrname else self.receiver
-        stmt = insert(mails).values(text=self.message, sender=self.sender, receiver=rcvr, date=self.date, time=self.time)  
+        stmt = insert(mails).values(
+            text=self.message, sender=self.sender, receiver=rcvr, date=self.date, time=self.time
+        )  
         
         with self.engine.begin() as conn:          
             conn.execute(stmt)
@@ -117,17 +141,6 @@ class Email:
                 select(users.c.username).filter_by(id=rcvr).label("receiver")
             )).fetchone()
             logging.info(f"Email sent from {result.sender.title()} to {result.receiver.title()}")
-        
-    @property
-    def engine(cls):
-        if cls._engine == None:
-            raise ValueError("Missing Engine")
-        else:
-            return cls._engine     
-
-    @engine.setter
-    def engine(cls, eng):
-        cls._engine = eng
 
 
 def myjson(python_mails):
@@ -138,5 +151,12 @@ if __name__ == "__main__":
     print("Metadata was called")
     metadata.create_all(engine)
 
-def create_schema(eng):
-    metadata.create_all(eng)
+class Schema:
+    @classmethod
+    def drop(self, engine):
+        # engine.dispose()
+        metadata.drop_all(engine)
+    
+    @classmethod
+    def create(self, engine):
+        metadata.create_all(engine)

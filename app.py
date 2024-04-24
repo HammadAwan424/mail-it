@@ -1,11 +1,13 @@
 from flask import Flask, render_template, session, redirect, request, abort
 from flask_session import Session
-from helpers import users, mails, Email, myjson, logged_in, create_schema
+from helpers import users, mails, Email, myjson, logged_in, Schema
 import logging
 from sqlalchemy import insert, create_engine, exists, select, update, Column, Integer, String, Table
 import json
 from flask_sqlalchemy import SQLAlchemy
 import os
+from datetime import timedelta
+from markupsafe import escape
 from config import CONFIG
 from datetime import timedelta
 
@@ -30,19 +32,21 @@ engine = create_engine(CONFIG['DATABASE_URL'])
 Email.engine = engine
 
 
-# Initialize Tables for the first time
+# Initialize OR Drop Tables for testing
 # with app.app_context():
-#     create_schema(engine)
+#     Schema.create(engine)
+# with app.app_context():
+#     Schema.drop(engine)
 
 
 # Configure Logging
-logging.getLogger('werkzeug').disabled = True
-logging.getLogger("sqlalchemy.engine.Engine").disabled = True
-logging.basicConfig(
-    level=logging.DEBUG, filename="logging.log",   
-    format="%(message)s at %(asctime)s",
-    datefmt="%X of %d %b",
-)
+# logging.getLogger('werkzeug').disabled = True
+# logging.getLogger("sqlalchemy.engine.Engine").disabled = True
+# logging.basicConfig(
+#     level=logging.DEBUG, filename="logging.log",   
+#     format="%(message)s at %(asctime)s",
+#     datefmt="%X of %d %b",
+# )
 
 
 @app.route("/")
@@ -154,20 +158,39 @@ def api(page):
     mails = Email.all_for(receiver_id=session["user"]["id"], page=page)
     if not len(mails['mails']):
         return abort(404)
-    template =  render_template("mails.html", serverSideMails=mails['mails'], page_request=True)
+    template =  render_template("components.html", serverSideMails=mails['mails'], page_request=True)
     response = myjson({"mails": mails, "template": template})
     return response
 
 @app.route("/autocomplete/<mode>/<query>")
 @logged_in
 def autocomplete(mode, query):
+    modes = ["username", "mails"]
+    if mode not in modes:
+        return abort(404)
+
+    id = session.get('user').get("id")
     if mode == "username":
-        stmt = select(users).where(users.c.username.startswith(query)).limit(3)
+        user_name = select(users.c.username).where(users.c.id == id).scalar_subquery()
+
+        stmt = select(users.c.username.regexp_replace(query, f'<strong>{query}</strong>').label("username")).where(
+            users.c.username.startswith(query), users.c.username != user_name
+        ).limit(3)
+        print(query)
+
         conn = engine.connect()
         result = conn.execute(stmt).mappings().all()
-        return render_template("mails.html", serverSideUsers=result, user_search_request=True)
         conn.close()
+        return render_template("components.html", serverSideUsers=result, user_search_request=True)
+        
     if mode == "mails":
-        id = session.get('user').get("id")
         result = Email.all_for(receiver_id=id, lmt=3, contains=query)['mails']
-        return render_template("mails.html", serverSideMails=result, mail_search_request=True)
+        return render_template("components.html", serverSideMails=result, mail_search_request=True)
+
+
+@app.route("/delete", methods=["POST"])
+@logged_in
+def delete():
+    body = request.json
+    Email.del_from_db(mail_id=body.get('mail_id'), user=session.get('user'))
+    return "successful"
