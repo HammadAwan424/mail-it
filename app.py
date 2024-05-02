@@ -40,13 +40,13 @@ Email.engine = engine
 
 
 # Configure Logging
-# logging.getLogger('werkzeug').disabled = True
-# logging.getLogger("sqlalchemy.engine.Engine").disabled = True
-# logging.basicConfig(
-#     level=logging.DEBUG, filename="logging.log",   
-#     format="%(message)s at %(asctime)s",
-#     datefmt="%X of %d %b",
-# )
+logging.getLogger('werkzeug').disabled = True
+logging.getLogger("sqlalchemy.engine.Engine").disabled = True
+logging.basicConfig(
+    level=logging.DEBUG,   
+    format="%(message)s at %(asctime)s",
+    datefmt="%X of %d %b",
+)
 
 
 @app.route("/")
