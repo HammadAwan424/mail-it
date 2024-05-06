@@ -6,6 +6,7 @@ import json
 from functools import wraps
 import logging
 from typing import List, Dict
+from markupsafe import escape
 
 
 def logged_in(f):
@@ -97,19 +98,74 @@ class Email:
                     mail["receiver"] = (mail.receiver, mail.username, mail.color)
                 mail_dicts.append(mail)
         return {"total": mail_count, "mails": mail_dicts, "count": len(mail_dicts), "perPage": lmt}
-        
+    
 
     @classmethod
-    def is_read(self, mail_id, user_id):
-        stmt = update(mails).values(read=True).where(mails.c.id == mail_id, mails.c.receiver == user_id)
+    def all_for_receiver(cls, id=None, page=1, lmt=4, contains=''):
+
+        # Offset so different pages can be returned
+        offset = (page-1)*lmt
+
+        # Query to return all mails with the same receiver
+        c = mails.c.id.label("mail_id")
+        query = select(c, mails, users).where(mails.c.receiver==id).join(users, mails.c.sender==users.c.id) 
+
+        # Formats the query (Order, Descending, limit, searches for <contains>) 
+        stmt = query.order_by(mails.c.date.desc(), mails.c.time.desc()).offset(offset).limit(lmt).where(mails.c.text.contains(contains))
+        
+
+        mail_dicts = []
+        with cls.engine.connect() as conn:
+            mail_count = conn.execute(select(func.count(mails.c.id)).where(mails.c.receiver == id)).scalar()
+
+            for mapping in conn.execute(stmt).mappings().all():
+                mail = dict(mapping)
+
+                # Info about the sender of each mail
+                mail["sender"] = (mail['sender'], mail['username'], mail['color'])
+                mail_dicts.append(mail)
+        return {"total": mail_count, "mails": mail_dicts, "count": len(mail_dicts), "perPage": lmt}
+    
+
+    @classmethod
+    def all_for_sender(cls, id=None, page=1, lmt=4, contains=''):
+
+        # Offset so different pages can be returned
+        offset = (page-1)*lmt
+
+        # Query to return all mails with the same sender
+        c = mails.c.id.label("mail_id")
+        query = select(c, mails, users).where(mails.c.sender==id).join(users, mails.c.receiver==users.c.id)
+
+        # Formats the query (Order, Descending, limit, searches for <contains>)
+        stmt = query.order_by(mails.c.date.desc(), mails.c.time.desc()).offset(offset).limit(lmt).where(mails.c.text.contains(contains))
+        
+        mail_dicts = []
+        with cls.engine.connect() as conn:
+            mail_count = conn.execute(select(func.count(mails.c.id)).where(mails.c.sender == id)).scalar()
+            
+            for mapping in conn.execute(stmt).mappings().all():
+                mail = dict(mapping)
+
+                # Info about the receiver of each mail  
+                mail["receiver"] = (mail.receiver, mail.username, mail.color)
+                mail_dicts.append(mail)
+        return {"total": mail_count, "mails": mail_dicts, "count": len(mail_dicts), "perPage": lmt}        
+    
+
+    @classmethod
+    def is_read(self, mail_id, receiver_id):
+        stmt = update(mails).values(read=True).where(mails.c.id == mail_id, mails.c.receiver == receiver_id)
         with self.engine.begin() as conn:
             conn.execute(stmt)
 
+
     @classmethod
-    def del_from_db(cls, mail_id, user):
-        stmt = delete(mails).where(mails.c.id==mail_id, mails.c.receiver==user.get('id'))
+    def del_from_db(cls, mail_id, user_id):
+        stmt = delete(mails).where(mails.c.id==mail_id, mails.c.receiver==user_id)
         with cls.engine.begin() as conn:
             conn.execute(stmt)
+
 
     def __init__(self, message, sender, receiver, date=None, time=None, **data):
         self.message = message
@@ -125,11 +181,12 @@ class Email:
         for key in data:
             setattr(self, key, data[key])
 
+
     def set(self, usrname: bool = False):
         # set usrname to True if username is stored on self.receiver, false if id
         rcvr = select(users.c.id).where(users.c.username == self.receiver).scalar_subquery() if usrname else self.receiver
         stmt = insert(mails).values(
-            text=self.message, sender=self.sender, receiver=rcvr, date=self.date, time=self.time
+            text=escape(self.message), sender=self.sender, receiver=rcvr, date=self.date, time=self.time
         )  
         
         with self.engine.begin() as conn:          
@@ -147,9 +204,11 @@ def myjson(python_mails):
     json_mails = json.dumps(python_mails, default=str, indent=2)
     return json_mails
 
+
 if __name__ == "__main__":
     print("Metadata was called")
     metadata.create_all(engine)
+
 
 class Schema:
     @classmethod

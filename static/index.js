@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", function () {
     (field = document.getElementById("searchbar")),
     (outputDest = mailField
       .closest(".search_bar")
-      .querySelector(".search-result"))
+      .querySelector(".search-result")),
   );
 
   //Turns on little UI interaction on navbar (child of sidebar) for Desktop (func defined below)
@@ -31,6 +31,7 @@ document.addEventListener("DOMContentLoaded", function () {
   //Loads the Form for desktop to send mail (func defined below)
   let composeBtn = document.querySelector(".sidebar-desk .compose-btn");
   composeBtn.addEventListener("click", renderComposeForm);
+  renderComposeForm()
 
   //Set up trash icons to send mail-delete requests with corresponding id (func defined below)
   mailDeleter(".third");
@@ -111,18 +112,30 @@ async function POST(url, body) {
 
 
 //Takes url and Input field to capture data and render HTML to outputDest
-function autoComplete(url, field, outputDest) {
+function autoComplete(url, field, outputDest, populateField=false) {
   field.addEventListener("input", async function () {
-    value = field.value.trim();
+    let value = field.value.trim();
     if (!value) {
       makeEmpty(outputDest);
       return;
     }
-    let response = await fetch(`${url}/${value}`);
-    response.text().then((val) => {
+
+    value = value.replaceAll("/", '%2F')
+    let encodedUrl = `${url}/${value}`
+
+    let response = await fetch(encodedUrl);
+    response.text()
+    .then((val) => {
       makeEmpty(outputDest);
       outputDest.innerHTML = val;
-    });
+    })
+    .then(() => {
+      if (!populateField) return
+      outputDest.addEventListener('click', function(event) {
+        field.value = event.target.textContent
+        makeEmpty(outputDest)
+      })
+    })
   });
 }
 
@@ -164,11 +177,13 @@ function dateManager(mails) {
   for (let i = 0; i < mails.length; i++) {
     let date = new Date(`${mails[i].date}T${mails[i].time}Z`);
 
-    let delta = (currentDate - date) / (1000 * 60); // stores minutes in delta
+    let delta = Math.floor((currentDate - date) / (1000 * 60)); // stores minutes in delta
     if (delta < 1) {
       dateElems[i].innerHTML = `Just now`;
+    } else if (delta == 1) {
+      dateElems[i].innerHTML = `${delta}min`
     } else if (delta < 60) {
-      dateElems[i].innerHTML = `${Math.floor(delta)}mins`;
+      dateElems[i].innerHTML = `${delta}mins`;
     } else if (delta < 1400) {
       dateElems[i].innerHTML = `${Math.floor(delta / 60)}hours`;
     } else {
@@ -315,7 +330,7 @@ async function requestPage(
   let to = unique + json.mails.count;
 
   document.querySelector(
-    ".page > .rect"
+    ".page-nav > .rect"
   ).innerHTML = `${from}-${to} of ${json.mails.total}`;
   clickedNav.page = Number(clickedNav.page) + requestedPage;
   secondaryNav.page = Number(secondaryNav.page) + requestedPage;
@@ -325,7 +340,6 @@ async function requestPage(
   checkboxObj.activate();
 
   dateManager(json["mails"]["mails"]);
-  console.log(json);
 }
 
 
@@ -344,7 +358,7 @@ function renderComposeForm() {
   composeForm.classList.add("no-mobile", "compose-area");
   composeForm.id = "composeForm";
   let html = `
-  <div class="ca-menu fw-bold light">
+  <div class="ca-header fw-bold light">
       <span class="m0">New Message</span>
       <div class="c-cross small">X</div>
   </div>
@@ -356,7 +370,7 @@ function renderComposeForm() {
           </div>
       </div>
   </div>
-  <input placeholder="Subject" class="light" type="text" name="subject" required autocomplete="off">
+  <input placeholder="Subject" class="light ca-subject" type="text" name="subject" required autocomplete="off">
   <textarea placeholder="Message" class="small light" required name="message"></textarea>
   <button class="send light">Send</button>
     `;
@@ -386,7 +400,8 @@ function renderComposeForm() {
   autoComplete(
     (url = "/autocomplete/username"),
     (field = document.getElementById("userSearch")),
-    (outputDest = document.getElementById("userSearchResult"))
+    (outputDest = document.getElementById("userSearchResult")),
+    (populateField = true)
   );
 }
 

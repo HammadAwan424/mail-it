@@ -68,14 +68,14 @@ def login():
     # manages post request
     data = request.form.get("username"), request.form.get("pass")
     with engine.connect() as conn:
-        db_user = conn.execute(select(users).where(users.c.username == data[0], users.c.password == data[1])).first()
-        if not db_user:
+        current_user = conn.execute(select(users).where(users.c.username == data[0], users.c.password == data[1])).first()
+        
+        if not current_user:
             return "You haven't registered"
         
-        session["user"] = {"id": db_user.id, "username": db_user.username}
-        logging.info(f"Logged In a User: {db_user[0]}")  
-        logging.info("redirecting to user profile from login, set up")   
-        return redirect("/user-profile")
+        session["user"] = {"id": current_user.id, "username": current_user.username, 'color': current_user.color}
+        logging.info(f"Logged In a User: {current_user[0]}")  
+        return redirect("/")
 
 
 @app.route("/user-profile", methods=["GET", "POST"])
@@ -85,26 +85,26 @@ def profile():
         logging.info("redirecting to login cuz not logged in from color")
         return redirect("/login")
     
-    # preprocessing for get request
+    # preprocessing for GET request
     id = session.get("user").get("id")
     with engine.connect() as conn:
         exists_color = conn.execute(select(users.c.color).where(users.c.id == id)).scalar()
 
+        # GET request
         if request.method == "GET" and exists_color:
-            session["user"]["color"] = exists_color
-            logging.info("to homepage everythin set up from color")
             return redirect("/")
         
-        if request.method == "GET":
+        if request.method == "GET" and not exists_color:
             return render_template("profile_color.html")
-        
+    
+    # POST request
     if request.method == "POST":
         with engine.begin() as conn:
             stmt = update(users).values(color = request.form.get("color")).where(users.c.id == id)
             conn.execute(stmt)
             session["user"]["color"] = request.form.get("color")
             logging.info("to home page after set up from color")
-            return redirect("/")
+        return redirect("/")
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -115,7 +115,8 @@ def register():
         
     
     #manages post request    
-    data = request.form.get("name"), request.form.get("pass"), request.form.get("con_pass")
+    data = escape(request.form.get("name")), request.form.get("pass"), request.form.get("con_pass")
+    print(data)
     if not data[0] or not data[1]:
         return "Please don't leave a field empty"
     if data[1] != data[2]:
@@ -126,7 +127,7 @@ def register():
     stmt = insert(users).values(username=data[0], password=data[1]).returning(users.c.id)
     with engine.begin() as conn:
         result = conn.execute(stmt).fetchone()
-        session["user"] = {"id": result.id ,"username": data[0]}
+        session["user"] = {"id": result.id ,"username": str(data[0])}
         logging.info(f"Registered a User: {data[0]}")
         return redirect("/user-profile")
     
@@ -135,7 +136,7 @@ def register():
 @logged_in
 def read():
     mail = request.args.get("mail_id")
-    Email.is_read(mail_id=mail, user_id=session["user"]["id"])
+    Email.is_read(mail_id=mail, receiver_id=session.get("user")["id"])
     return myjson({"status": "success", "message": f"Email {mail} marked as read"})
 
 @app.route("/send", methods=["GET", "POST"])
@@ -162,14 +163,16 @@ def api(page):
     response = myjson({"mails": mails, "template": template})
     return response
 
-@app.route("/autocomplete/<mode>/<query>")
+@app.route("/autocomplete/<mode>/<path:query>")
 @logged_in
 def autocomplete(mode, query):
     modes = ["username", "mails"]
     if mode not in modes:
         return abort(404)
-
+    
+    query = escape(query)
     id = session.get('user').get("id")
+    
     if mode == "username":
         user_name = select(users.c.username).where(users.c.id == id).scalar_subquery()
 
@@ -192,5 +195,5 @@ def autocomplete(mode, query):
 @logged_in
 def delete():
     body = request.json
-    Email.del_from_db(mail_id=body.get('mail_id'), user=session.get('user'))
+    Email.del_from_db(mail_id=body.get('mail_id'), user=session.get('user')['id'])
     return "successful"

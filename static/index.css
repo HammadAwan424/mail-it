@@ -271,6 +271,7 @@ td {
         grid-template-columns: auto 1fr;
         grid-template-rows: auto auto auto 1fr auto;
         border-radius: 8px;
+        border: 2px solid;
         height: 70%;
         width: 600px;
         right: 70px;
@@ -279,17 +280,15 @@ td {
     }
     .compose-area>textarea[placeholder="Message"],
     .compose-area>input[placeholder="Subject"],
-    .compose-area > .ca-menu  {
+    .compose-area > .ca-header  {
         grid-column: 1 / 3;
     }
     .compose-area > *:not(button) {
         background-color: transparent;
         outline: none;
-        border: none;
         margin: 0;
         padding: 5px;
         position: relative;
-        border-top: 1px solid black;
     }
 
     
@@ -369,6 +368,19 @@ td {
         width: 100px;
         border-radius: 20px;
     }
+    .ca-header {
+        border-bottom: 1px solid black;
+    }
+    .ca-subject {
+        border: none;
+        border-top: 1px solid black;
+        border-bottom: 1px solid black;
+    }
+    .compose-area textarea {
+        border: none
+    }
+
+    
     .no-desktop {
         display: none;
     }
