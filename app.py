@@ -186,8 +186,8 @@ def autocomplete(mode, query):
     if mode == "mails":
         result = Email.all_for(receiver_id=id, lmt=3, contains=query)['mails']
         return render_template("components.html", serverSideMails=result, mail_search_request=True)
-
-
+    
+    
 @app.route("/delete", methods=["POST"])
 @logged_in
 def delete():
