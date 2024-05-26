@@ -1,7 +1,8 @@
 # This code is for development and includes certain shortcuts for basic tasks for testing purposes
 from sqlalchemy import users, select, engine
 from flask import redirect, session
-from helpers import Email
+from helpers import Email, metadata
+
 
 
 
@@ -76,3 +77,10 @@ def fsdf():
     with engine.connect() as conn:
         result = conn.execute(stmt).mappings().all()
     return str(result)
+
+
+@app.route("/restart/database")
+def restartDatabase():
+    metadata.drop_all(engine)
+    metadata.create_all(engine)
+    return redirect('/')

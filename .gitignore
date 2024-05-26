@@ -4,6 +4,7 @@
 __pycache__
 p.py
 session.db
+config.json
 
 # Environments 
 .env 

@@ -1,12 +1,13 @@
 from flask import session, redirect
 from sqlalchemy import Table, Column, MetaData, Integer, String, \
     Boolean, ForeignKey, create_engine, insert, select, delete, update, exists, func, Date, Time, text
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import json
 from functools import wraps
 import logging
 from typing import List, Dict
 from markupsafe import escape
+import os
 
 
 def logged_in(f):
@@ -203,6 +204,39 @@ class Email:
 def myjson(python_mails):
     json_mails = json.dumps(python_mails, default=str, indent=2)
     return json_mails
+        
+        
+
+class Config:
+
+    ProductionConfig = {
+        "SQLALCHEMY_DATABASE_URI": os.environ.get("POSTGRES_URL_SQLALCHEMY"),
+        "SESSION_TYPE": 'sqlalchemy',
+        "SESSION_PERMANENT": False,
+        'SQLALCHEMY_ECHO': False,
+        "PERMANENT_SESSION_LIFETIME": timedelta(minutes=30),
+
+        "DATABASE_URL": os.environ.get("POSTGRES_URL_SQLALCHEMY")
+    }
+
+    @classmethod
+    def LoadProductionConfig(cls, config):
+        config.update(cls.ProductionConfig)
+
+    @classmethod
+    def LoadDevelopmentConfig(cls, config):
+        with open("config.json", "r") as file: 
+            CurrentConfig = json.load(file)
+            cls.ProductionConfig = CurrentConfig
+            config.update(CurrentConfig)
+
+        # Load Test Routes for Dev
+        import test
+
+    @classmethod
+    def get(cls, key):
+        return cls.ProductionConfig.get(key)
+
 
 
 if __name__ == "__main__":
@@ -210,12 +244,3 @@ if __name__ == "__main__":
     metadata.create_all(engine)
 
 
-class Schema:
-    @classmethod
-    def drop(self, engine):
-        # engine.dispose()
-        metadata.drop_all(engine)
-    
-    @classmethod
-    def create(self, engine):
-        metadata.create_all(engine)

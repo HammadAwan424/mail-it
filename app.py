@@ -1,6 +1,6 @@
 from flask import Flask, render_template, session, redirect, request, abort
 from flask_session import Session
-from helpers import users, mails, Email, myjson, logged_in, Schema
+from helpers import users, mails, Email, myjson, logged_in, Config
 import logging
 from sqlalchemy import insert, create_engine, exists, select, update, Column, Integer, String, Table
 import json
@@ -8,36 +8,26 @@ from flask_sqlalchemy import SQLAlchemy
 import os
 from datetime import timedelta
 from markupsafe import escape
-from config import CONFIG
 from datetime import timedelta
 
 app = Flask(__name__)
 
-app.config["SQLALCHEMY_DATABASE_URI"] = CONFIG['DATABASE_URL']
+if os.environ.get("ProductionMailit"):
+    Config.LoadProductionConfig(app.config)
+else:
+    Config.LoadDevelopmentConfig(app.config)
+
 db = SQLAlchemy(app)
 
 app.jinja_env.filters["myjson"] = myjson
 
 # Configure Session 
-app.config["SESSION_TYPE"] = "sqlalchemy"
-app.config["SESSION_PERMANENT"] = False
 app.config['SESSION_SQLALCHEMY'] = db
-app.config['SQLALCHEMY_ECHO'] = True
-app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=30)
-
 Session(app)
 
 # Initialize Self created Class, Email in helpers.py
-engine = create_engine(CONFIG['DATABASE_URL'])
+engine = create_engine(Config.get("DATABASE_URL"))
 Email.engine = engine
-
-
-# Initialize OR Drop Tables for testing
-# with app.app_context():
-#     Schema.create(engine)
-# with app.app_context():
-#     Schema.drop(engine)
-
 
 # Configure Logging
 logging.getLogger('werkzeug').disabled = True
@@ -47,6 +37,7 @@ logging.basicConfig(
     format="%(message)s at %(asctime)s",
     datefmt="%X of %d %b",
 )
+
 
 
 @app.route("/")
