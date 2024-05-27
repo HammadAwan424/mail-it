@@ -1,4 +1,4 @@
-from flask import session, redirect
+from flask import session, redirect, make_response, jsonify
 from sqlalchemy import Table, Column, MetaData, Integer, String, \
     Boolean, ForeignKey, create_engine, insert, select, delete, update, exists, func, Date, Time, text
 from datetime import datetime, timezone, timedelta
@@ -8,6 +8,29 @@ import logging
 from typing import List, Dict
 from markupsafe import escape
 import os
+from wtforms import Form, StringField, validators, ValidationError, IntegerField
+
+class MailForm(Form):
+    sender = StringField("sender", [validators.DataRequired()])
+    receiver = StringField("receiver", [validators.DataRequired()])
+    message = StringField("message", [validators.DataRequired(message="Can't send an empty message")])
+    subject = StringField("subject", [validators.DataRequired()])
+
+
+    def __init__(self, engine, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.engine = engine
+
+    def validate_receiver(form, field):
+        with form.engine.connect() as conn:
+            stmt = select(users).where(users.c.username == field.data)
+            if not conn.execute(stmt).fetchone():
+                raise ValidationError(f"The user '{field.data}' doesn't exist, check if there is a typo.")
+            
+def apology(body, code=404):
+    response = jsonify(body)
+    response.status_code = code
+    return response
 
 
 def logged_in(f):
@@ -226,9 +249,11 @@ class Config:
     @classmethod
     def LoadDevelopmentConfig(cls, config):
         with open("config.json", "r") as file: 
-            CurrentConfig = json.load(file)
-            cls.ProductionConfig = CurrentConfig
-            config.update(CurrentConfig)
+            LoadedConfig = json.load(file)
+            cls.ProductionConfig = LoadedConfig
+            config.update(LoadedConfig)
+
+            logging.basicConfig(filename=LoadedConfig["LogFileName"])
 
         # Load Test Routes for Dev
         import test

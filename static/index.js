@@ -365,13 +365,13 @@ function renderComposeForm() {
   <span class="light">To</span>
   <div id="receiver">
       <div class="recepient">
-          <input id="userSearch" class="light input" placeholder="Recepient" name="receiver" type="text" required autocomplete="off" autofocus>
+          <input id="userSearch" class="light input" placeholder="Recepient" name="Receiver" type="text" required autocomplete="off" autofocus>
           <div id="userSearchResult">
           </div>
       </div>
   </div>
-  <input placeholder="Subject" class="light ca-subject" type="text" name="subject" required autocomplete="off">
-  <textarea placeholder="Message" class="small light" required name="message"></textarea>
+  <input placeholder="Subject" class="light ca-subject" type="text" name="Subject" required autocomplete="off">
+  <textarea placeholder="Message" class="small light" required name="Message"></textarea>
   <button class="send light">Send</button>
     `;
   composeForm.innerHTML = html;
@@ -394,6 +394,13 @@ function renderComposeForm() {
     res = await POST("/send", data);
     if (res.status == 200) {
       alert("Your message has been sent successfully");
+    } else if (res.status == 400) {
+      res.json()
+      .then((data) => {
+        console.log(data)
+        console.log(data.error)
+        alert(`Error Occurred: ${data.error}`)
+      })
     }
   });
 

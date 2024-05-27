@@ -1,6 +1,6 @@
-from flask import Flask, render_template, session, redirect, request, abort
+from flask import Flask, render_template, session, redirect, request, abort, jsonify
 from flask_session import Session
-from helpers import users, mails, Email, myjson, logged_in, Config
+from helpers import users, mails, Email, myjson, logged_in, Config, MailForm, apology
 import logging
 from sqlalchemy import insert, create_engine, exists, select, update, Column, Integer, String, Table
 import json
@@ -12,7 +12,7 @@ from datetime import timedelta
 
 app = Flask(__name__)
 
-if os.environ.get("ProductionMailit"):
+if os.environ.get("ENV") == "ProductionMailit":
     Config.LoadProductionConfig(app.config)
 else:
     Config.LoadDevelopmentConfig(app.config)
@@ -130,18 +130,24 @@ def read():
     Email.is_read(mail_id=mail, receiver_id=session.get("user")["id"])
     return myjson({"status": "success", "message": f"Email {mail} marked as read"})
 
+
 @app.route("/send", methods=["GET", "POST"])
 @logged_in
 def send():
-    data = {
-        "sender": session["user"]["id"],
-        "receiver": request.json.get("receiver"),
-        "subject": request.json.get("subject"),
-        "message": request.json.get("message")
-    }
-    mail = Email(data["message"], data["sender"], data["receiver"])
+    mailform = MailForm(engine, data=request.json, sender=session.get("user").get("id"))
+
+    if not mailform.validate():
+        FirstInvalidatedFieldErrors = next(iter(mailform.errors.values()))
+        body = {
+            "error": FirstInvalidatedFieldErrors[0] # First error of FirstInvalidatedField
+        }
+        logging.debug(f"{body}")
+        logging.debug(f"{mailform.errors}")
+        return apology(body, 400)
+
+    mail = Email(**mailform.data)
     mail.set(usrname=True)
-    return "success"
+    return jsonify({"status": "success"})
 
 
 @app.route("/api/page/<int:page>")
@@ -170,7 +176,6 @@ def autocomplete(mode, query):
         stmt = select(users.c.username.regexp_replace(query, f'<strong>{query}</strong>').label("username")).where(
             users.c.username.startswith(query), users.c.username != user_name
         ).limit(3)
-        print(query)
 
         conn = engine.connect()
         result = conn.execute(stmt).mappings().all()
@@ -182,6 +187,9 @@ def autocomplete(mode, query):
         return render_template("components.html", serverSideMails=result, mail_search_request=True)
     
     
+
+
+
 @app.route("/delete", methods=["POST"])
 @logged_in
 def delete():
