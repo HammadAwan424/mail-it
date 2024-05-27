@@ -194,5 +194,5 @@ def autocomplete(mode, query):
 @logged_in
 def delete():
     body = request.json
-    Email.del_from_db(mail_id=body.get('mail_id'), user=session.get('user')['id'])
+    Email.del_from_db(mail_id=body.get('mail_id'), user_id=session.get('user')['id'])
     return "successful"

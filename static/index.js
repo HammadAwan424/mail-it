@@ -28,11 +28,12 @@ document.addEventListener("DOMContentLoaded", function () {
         requestPage(event.target, "#next", -1, checkboxManager);
     });
 
-  //Loads the Form for desktop to send mail (func defined below)
-  let composeBtn = document.querySelector(".sidebar-desk .compose-btn");
-  composeBtn.addEventListener("click", renderComposeForm);
-  renderComposeForm()
-
+  //Loads the Form to send mail (func defined below)
+  let composeBtnDesk = document.querySelector(".sidebar-desk .compose-btn")
+  let composeBtnMobile = document.getElementById("compose-btn-mobile")
+  composeBtnDesk.addEventListener("click", renderComposeForm);
+  composeBtnMobile.addEventListener("click", renderComposeForm)
+  
   //Set up trash icons to send mail-delete requests with corresponding id (func defined below)
   mailDeleter(".third");
 
@@ -45,7 +46,7 @@ document.addEventListener("DOMContentLoaded", function () {
   dateManager(mails);
 
   //Plays an animation for mobile devices when mail is selected (func defined below)
-  mailSelectAnimation()
+  // mailSelectAnimation()
 
   //Makes a mail read (unbold) when clicked, simulating it is read by user
   document.querySelectorAll("tr > .sixth").forEach(function (tr) {
@@ -61,7 +62,6 @@ document.addEventListener("DOMContentLoaded", function () {
   document.getElementById("hamburger").addEventListener("click", function () {
     document.querySelector(".sidebar-desk").classList.toggle("animate");
   });
-
 });
 
 
@@ -355,7 +355,7 @@ function renderComposeForm() {
   }
   let composeForm = document.createElement("form");
 
-  composeForm.classList.add("no-mobile", "compose-area");
+  composeForm.classList.add("compose-area");
   composeForm.id = "composeForm";
   let html = `
   <div class="ca-header fw-bold light">

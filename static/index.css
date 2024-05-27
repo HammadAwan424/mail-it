@@ -248,10 +248,128 @@ td {
 
 
 
+.compose-area {
+    position: absolute;
+    display: grid;
+    background-color: var(--second-color);
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto auto 1fr auto;
+    height: 100%;
+    top: 0px;
+    width: 100%;
+    overflow: hidden;
+}
+.compose-area>textarea[placeholder="Message"],
+.compose-area>input[placeholder="Subject"],
+.compose-area > .ca-header  {
+    grid-column: 1 / 3;
+}
+.compose-area > *:not(button) {
+    background-color: transparent;
+    outline: none;
+    margin: 0;
+    padding: 8px;
+    position: relative;
+}
+
+
+.recepient {
+    width: 100%;
+    z-index: 2;
+    position: absolute;
+}
+.recepient input {
+    background-color: transparent;
+    outline: none;
+    border: none;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    border: none;
+    display: block;
+}
+.recepient ul {
+    position: relative;
+    top: 5px;
+}
+.recepient li {
+    padding: 0.3rem 1rem;
+    border: 1px solid white;
+    width: 30%;
+    cursor: pointer;
+    background-color: var(--second-color);
+}
+.recepient li:hover {
+    background-color: var(--hover-color);
+}
+
+
+.compose-area > textarea {
+    white-space: pre-wrap;
+}
+.c-cross {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    right: 10px;
+    top: 50%;
+    transform: translate(0, -50%);
+    cursor: pointer;
+}
+.c-cross::before {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    top: -25%;
+    left: -25%;
+    height: 150%;
+    width: 150%;
+    background-color: rgb(114, 114, 114);
+    opacity: 0;
+    z-index: -1;
+    transition: all 0.3s;
+}
+.c-cross:hover::before {
+    opacity: 1;
+}
+.compose-btn {
+    text-align: center;
+    width: 8rem;
+    padding: 0.8rem 0;
+    border-radius: 1rem;
+}
+.send {
+    background: linear-gradient(90deg, rgb(30, 97, 151), rgb(30, 97, 151));
+    border: none;
+    padding: 5px;
+    margin: 5px;
+    width: 100px;
+    border-radius: 20px;
+}
+.ca-header {
+    border-bottom: 1px solid black;
+}
+.ca-subject {
+    border: none;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+}
+.compose-area textarea {
+    border: none
+}
+
 
 @media screen and (max-width: 768px) {
+    .compose-btn{ /* Specially for mobile */
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+    }
     .no-mobile {
-        display: none;
+        display: none !important;
     }
     .sixth > div {
         font-size: small;
@@ -265,124 +383,21 @@ td {
 
 @media screen and (min-width: 768px) {
     .compose-area {
-        position: absolute;
-        display: grid;
-        background-color: var(--second-color);
-        grid-template-columns: auto 1fr;
-        grid-template-rows: auto auto auto 1fr auto;
-        border-radius: 8px;
         border: 2px solid;
         height: 70%;
         width: 600px;
         right: 70px;
         bottom: 0;
-        overflow: hidden;
-    }
-    .compose-area>textarea[placeholder="Message"],
-    .compose-area>input[placeholder="Subject"],
-    .compose-area > .ca-header  {
-        grid-column: 1 / 3;
-    }
-    .compose-area > *:not(button) {
-        background-color: transparent;
-        outline: none;
-        margin: 0;
-        padding: 5px;
-        position: relative;
-    }
-
-    
-    .recepient {
-        width: 100%;
-        z-index: 2;
-        position: absolute;
-    }
-    .recepient input {
-        background-color: transparent;
-        outline: none;
-        border: none;
-        margin: 0;
-        padding: 0;
-        width: 100%;
-        border: none;
-        display: block;
-    }
-    .recepient ul {
-        position: relative;
-        top: 5px;
-    }
-    .recepient li {
-        padding: 0.3rem 1rem;
-        border: 1px solid white;
-        width: 30%;
-        cursor: pointer;
-        background-color: var(--second-color);
-    }
-    .recepient li:hover {
-        background-color: var(--hover-color);
-    }
-
-    
-    .compose-area > textarea {
-        white-space: pre-wrap;
-    }
-    .c-cross {
-        position: absolute;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 20px;
-        height: 20px;
-        right: 10px;
-        top: 50%;
-        transform: translate(0, -50%);
-        cursor: pointer;
-    }
-    .c-cross::before {
-        content: "";
-        position: absolute;
-        border-radius: 50%;
-        top: -25%;
-        left: -25%;
-        height: 150%;
-        width: 150%;
-        background-color: rgb(114, 114, 114);
-        opacity: 0;
-        z-index: -1;
-        transition: all 0.3s;
-    }
-    .c-cross:hover::before {
-        opacity: 1;
+        top: auto;
     }
     .compose-btn {
-        padding: 0.8rem 2.5rem;
-        border-radius: 1rem;
+        max-width: 9rem;
+        width: 80%;
         margin: 2rem 0 0.5rem 1rem;
         display: block;
     }
-    .send {
-        background: linear-gradient(90deg, rgb(30, 97, 151), rgb(30, 97, 151));
-        border: none;
-        padding: 5px;
-        margin: 5px;
-        width: 100px;
-        border-radius: 20px;
-    }
-    .ca-header {
-        border-bottom: 1px solid black;
-    }
-    .ca-subject {
-        border: none;
-        border-top: 1px solid black;
-        border-bottom: 1px solid black;
-    }
-    .compose-area textarea {
-        border: none
-    }
-
-    
     .no-desktop {
-        display: none;
+        display: none !important;
     }
     .search_bar {
         width: 50%;
