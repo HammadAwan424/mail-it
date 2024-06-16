@@ -57,7 +57,7 @@ def login():
         return redirect("/")
     
     # manages post request
-    data = request.form.get("username"), request.form.get("pass")
+    data = request.form.get("username").lower(), request.form.get("pass")
     with engine.connect() as conn:
         current_user = conn.execute(select(users).where(users.c.username == data[0], users.c.password == data[1])).first()
         
